@@ -56,4 +56,4 @@ cd $STARTDIR
 
 # Copy the JAR out so that the likes of IntelliJ can use it
 rm -f libs/opencv-$VER.jar
-cp /usr/local/share/OpenCV/java/opencv-`echo $VER | sed 's/.//g'`.jar libs/opencv-$VER.jar
+cp /usr/local/share/OpenCV/java/opencv-`echo $VER | sed 's/\.//g'`.jar libs/opencv-$VER.jar
