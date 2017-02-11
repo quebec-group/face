@@ -37,6 +37,14 @@ then
 	curl -q -L "https://github.com/opencv/opencv_contrib/archive/$VER.zip" > $opencv_contrib_zip
 	unzip -q $opencv_contrib_zip
 	rm -f $opencv_contrib_zip
+	
+	# The face module needs to be patched to force compilation of the Java bindings
+	patch opencv_contrib-$VER/modules/face/CMakeLists.txt << EOF
+2c2
+< ocv_define_module(face opencv_core opencv_imgproc opencv_objdetect WRAP python)
+---
+> ocv_define_module(face opencv_core opencv_imgproc opencv_objdetect WRAP python java)
+EOF
 fi
 
 # Create build directory
@@ -55,5 +63,6 @@ cd ../../
 cd $STARTDIR
 
 # Copy the JAR out so that the likes of IntelliJ can use it
+mkdir -p libs
 rm -f libs/opencv-$VER.jar
 cp /usr/local/share/OpenCV/java/opencv-`echo $VER | sed 's/\.//g'`.jar libs/opencv-$VER.jar

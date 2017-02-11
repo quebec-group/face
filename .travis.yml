@@ -2,6 +2,9 @@ sudo: required
 
 language: java
 
+jdk:
+  - oraclejdk8
+
 before_install:
 #  - sudo echo "deb http://ppa.launchpad.net/jon-severinsson/ffmpeg/ubuntu quantal main" >> /etc/apt/sources.list
 #  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1DB8ADC1CFCA9579
@@ -19,4 +22,4 @@ before_install:
 
 
 script:
-  - /bin/sh -c "exit 0"
+  - /bin/sh ./run.sh trial.OpenCvTrial
