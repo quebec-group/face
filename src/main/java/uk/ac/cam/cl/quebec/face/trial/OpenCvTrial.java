@@ -1,10 +1,12 @@
 package uk.ac.cam.cl.quebec.face.trial;
 
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
+
 import org.opencv.face.Face;
+
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Initial trials of getting OpenCV to work with java
@@ -21,8 +23,28 @@ public class OpenCvTrial
 
     private static void basicFaceTest()
     {
+        CascadeClassifier classifier = new CascadeClassifier("/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml");
+        for (int i = 1; i < 8; i++)
+            recogniseFaces(classifier, Integer.toString(i));
+
         Face f = new Face();
         f.createBIF();
+    }
+
+    private static void recogniseFaces(CascadeClassifier classifier, String name)
+    {
+        Mat input = Imgcodecs.imread("img/" + name + ".jpg");
+        Mat greyscale = new Mat();
+        System.out.println(input.channels());
+        Imgproc.cvtColor(input, greyscale, Imgproc.COLOR_BGR2GRAY);
+
+        MatOfRect rects = new MatOfRect();
+        classifier.detectMultiScale(greyscale, rects);
+
+        for (Rect r : rects.toList())
+            Imgproc.rectangle(input, r.tl(), r.br(), new Scalar(255, 0, 0), 2);
+
+        Imgcodecs.imwrite("img/" + name + "-out.jpg", input);
     }
 
     private static void openCvExampleTest()
