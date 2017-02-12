@@ -18,8 +18,8 @@ before_install:
   - sudo apt-get install -y -q libavformat-dev libavcodec-dev libavfilter-dev libswscale-dev
   - sudo apt-get install -y -q libjpeg-dev libpng-dev libtiff-dev libjasper-dev zlib1g-dev libopenexr-dev libxine-dev libeigen3-dev libtbb-dev
   
-  - sudo /bin/bash ./setup-opencv.sh
+  - sudo ./setup-opencv.sh
 
 
 script:
-  - /bin/sh ./run.sh trial.OpenCvTrial
+  - ./run.sh trial.OpenCvTrial
