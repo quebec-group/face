@@ -8,11 +8,13 @@ import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
  */
 public class S3AssetDownloader
 {
-    public static void downloadVideo(ProcessVideoMessage msg)
+    public static String downloadVideo(ProcessVideoMessage msg)
     {
+        return "";
     }
 
-    public static void downloadImage(AddPhotoMessage msg)
+    public static String downloadImage(AddPhotoMessage msg)
     {
+        return "";
     }
 }
