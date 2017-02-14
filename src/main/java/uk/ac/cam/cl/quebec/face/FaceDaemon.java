@@ -43,34 +43,43 @@ public class FaceDaemon
 
     private void connectToQueue()
     {
-        tempQueue.add(new AddPhotoMessage(0, 3, "img/training/0/0.jpg"));
-        tempQueue.add(new AddPhotoMessage(1, 3, "img/training/0/1.jpg"));
+        tempQueue.add(new AddPhotoMessage(0, 0, "img/training/0/0.jpg"));
+        tempQueue.add(new AddPhotoMessage(1, 0, "img/training/0/1.jpg"));
+        tempQueue.add(new AddPhotoMessage(2, 0, "img/training/0/2.jpg"));
+        tempQueue.add(new AddPhotoMessage(3, 0, "img/training/0/3.jpg"));
+        tempQueue.add(new AddPhotoMessage(4, 0, "img/training/0/4.jpg"));
+        tempQueue.add(new AddPhotoMessage(10, 1, "img/training/1/0.jpg"));
+        tempQueue.add(new AddPhotoMessage(11, 1, "img/training/1/1.jpg"));
+        tempQueue.add(new AddPhotoMessage(12, 1, "img/training/1/2.jpg"));
         Set<Integer> photos1 = new HashSet<>();
         photos1.add(0);
-        tempQueue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
+        tempQueue.add(new ProcessVideoMessage(11, "img/video/0.mp4", photos1));
     }
 
-    private Message getJobFromQueue()
+    private Message getJobFromQueue() throws FaceException
     {
         if (currentMsg < tempQueue.size()) {
             currentMsg++;
             return tempQueue.get(currentMsg-1);
         }
-        throw new NotImplementedException();
+        throw new FaceException("End of message queue");
     }
 
     private void run()
     {
         while (true)
         {
-            Message job = getJobFromQueue();
             S3AssetDownloader downloader = new S3AssetDownloader();
-            MessageProcessor processor = new MessageProcessor(downloader);
-
             try {
+                MessageProcessor processor = new MessageProcessor(downloader);
+                Message job = getJobFromQueue();
+
                 job.visit(processor);
             }
             catch (FaceException e) {
+                if (e.getMessage().equals("End of message queue")) {
+                    break;
+                }
                 e.printStackTrace();
             }
 
