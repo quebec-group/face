@@ -61,16 +61,20 @@ public class FaceDaemon
 
     private void run()
     {
-        MessageProcessor processor = new MessageProcessor();
         while (true)
         {
             Message job = getJobFromQueue();
+            S3AssetDownloader downloader = new S3AssetDownloader();
+            MessageProcessor processor = new MessageProcessor(downloader);
+
             try {
                 job.visit(processor);
             }
             catch (FaceException e) {
                 e.printStackTrace();
             }
+
+            downloader.cleanupTempFiles();
         }
     }
 

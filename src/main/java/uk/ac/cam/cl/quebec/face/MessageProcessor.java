@@ -7,6 +7,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
 import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 
@@ -24,11 +25,17 @@ public class MessageProcessor implements MessageVisitor
 
     private static final String localTrainingFile = "/tmp/opencv-training.yaml";
 
+    private S3AssetDownloader s3Downloader;
+
+    public MessageProcessor(S3AssetDownloader downloader) {
+        s3Downloader = downloader;
+    }
+
     public void accept(AddPhotoMessage msg) throws FaceException
     {
         System.out.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
         // Fetch image from S3
-        String imgPath = S3AssetDownloader.downloadImage(msg);
+        String imgPath = s3Downloader.downloadImage(msg);
 
         // Load it into memory - all our OpenCV operations operate on greyscale images
         Mat imageInput = Imgcodecs.imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
