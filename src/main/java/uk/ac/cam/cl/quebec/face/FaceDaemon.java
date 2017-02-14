@@ -1,6 +1,7 @@
 package uk.ac.cam.cl.quebec.face;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
@@ -42,11 +43,11 @@ public class FaceDaemon
 
     private void connectToQueue()
     {
-        tempQueue.add(new AddPhotoMessage(5, ""));
-        tempQueue.add(new AddPhotoMessage(6, ""));
+        tempQueue.add(new AddPhotoMessage(0, 3, "img/training/0/0.jpg"));
+        tempQueue.add(new AddPhotoMessage(1, 3, "img/training/0/1.jpg"));
         Set<Integer> photos1 = new HashSet<>();
-        photos1.add(5);
-        tempQueue.add(new ProcessVideoMessage(11, photos1));
+        photos1.add(0);
+        tempQueue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
     }
 
     private Message getJobFromQueue()
@@ -64,7 +65,12 @@ public class FaceDaemon
         while (true)
         {
             Message job = getJobFromQueue();
-            job.visit(processor);
+            try {
+                job.visit(processor);
+            }
+            catch (FaceException e) {
+                e.printStackTrace();
+            }
         }
     }
 

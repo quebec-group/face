@@ -10,11 +10,11 @@ public class S3AssetDownloader
 {
     public static String downloadVideo(ProcessVideoMessage msg)
     {
-        return "";
+        return msg.getS3FilePath();
     }
 
     public static String downloadImage(AddPhotoMessage msg)
     {
-        return "";
+        return msg.getS3FilePath();
     }
 }
