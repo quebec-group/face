@@ -1,5 +1,15 @@
 package uk.ac.cam.cl.quebec.face;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.Message;
+import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Main class for the FaceDaemon detection daemon.
  * This class polls a queue to be given jobs, taking input and returning results to s3.
@@ -26,28 +36,35 @@ public class FaceDaemon
         return true;
     }
 
+    // Temporary fake queue
+    List<Message> tempQueue = new ArrayList<>();
+    int currentMsg = 0;
+
     private void connectToQueue()
     {
-
+        tempQueue.add(new AddPhotoMessage(5, ""));
+        tempQueue.add(new AddPhotoMessage(6, ""));
+        Set<Integer> photos1 = new HashSet<>();
+        photos1.add(5);
+        tempQueue.add(new ProcessVideoMessage(11, photos1));
     }
 
-    private FaceJob getJobFromQueue()
+    private Message getJobFromQueue()
     {
-        return new FaceJob();
+        if (currentMsg < tempQueue.size()) {
+            currentMsg++;
+            return tempQueue.get(currentMsg-1);
+        }
+        throw new NotImplementedException();
     }
 
     private void run()
     {
+        MessageProcessor processor = new MessageProcessor();
         while (true)
         {
-            FaceJob job = getJobFromQueue();
-
-            S3AssetDownloader.downloadVideo(job);
-            // Maybe image download could be asynchronous - if
-            // we have useful work to do on the video first
-            S3AssetDownloader.downloadImages(job);
-
-            // Process the images...
+            Message job = getJobFromQueue();
+            job.visit(processor);
         }
     }
 

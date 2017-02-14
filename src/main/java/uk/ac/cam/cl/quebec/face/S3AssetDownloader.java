@@ -1,15 +1,18 @@
 package uk.ac.cam.cl.quebec.face;
 
+import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+
 /**
  * Downloads video and image files from s3 to temporary storage, for processing
  */
 public class S3AssetDownloader
 {
-    public static void downloadVideo(FaceJob job)
+    public static void downloadVideo(ProcessVideoMessage msg)
     {
     }
 
-    public static void downloadImages(FaceJob job)
+    public static void downloadImage(AddPhotoMessage msg)
     {
     }
 }
