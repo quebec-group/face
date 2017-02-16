@@ -1,6 +1,7 @@
 package uk.ac.cam.cl.quebec.face;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import uk.ac.cam.cl.quebec.face.aws.S3AssetDownloader;
 import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;

@@ -1,4 +1,4 @@
-package uk.ac.cam.cl.quebec.face;
+package uk.ac.cam.cl.quebec.face.aws;
 
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -21,8 +21,7 @@ public class RequestManager {
 
     public RequestManager() {
         sqs = new AmazonSQSClient(CredentialsManager.getCredentials());
-        Region region = Region.getRegion(Regions.EU_WEST_1);
-        sqs.setRegion(region);
+        sqs.setRegion(CredentialsManager.getRegion());
     }
 
     public void sendMessageToQueue(String queue, String message) {

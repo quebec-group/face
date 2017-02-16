@@ -1,12 +1,15 @@
-package uk.ac.cam.cl.quebec.face;
+package uk.ac.cam.cl.quebec.face.aws;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 
 public class CredentialsManager {
     private static AWSCredentials credentials;
     private static String credentialsPath = "/Users/callum/Desktop/SqsCredentials.txt";
+    private static Region region = Region.getRegion(Regions.EU_WEST_1);
 
     /*
      * Create your credentials file at credentialsPath
@@ -21,7 +24,6 @@ public class CredentialsManager {
 
     static AWSCredentials getCredentials() {
         if (credentials == null) {
-            credentials = null;
             try {
                 credentials = new ProfileCredentialsProvider(credentialsPath, "default").getCredentials();
             } catch (Exception e) {
@@ -34,5 +36,9 @@ public class CredentialsManager {
         }
 
         return credentials;
+    }
+
+    public static Region getRegion() {
+        return region;
     }
 }

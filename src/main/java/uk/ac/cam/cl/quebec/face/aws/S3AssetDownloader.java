@@ -1,4 +1,4 @@
-package uk.ac.cam.cl.quebec.face;
+package uk.ac.cam.cl.quebec.face.aws;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -40,8 +40,7 @@ public class S3AssetDownloader {
 
     private File downloadS3File(String url){
         AmazonS3 s3 = new AmazonS3Client(CredentialsManager.getCredentials());
-        Region region = Region.getRegion(Regions.EU_WEST_1);
-        s3.setRegion(region);
+        s3.setRegion(CredentialsManager.getRegion());
 
         File file = null;
 

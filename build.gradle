@@ -50,6 +50,7 @@ dependencies {
     compile group: 'org.opencv', name: 'opencv', version: '3.2.0'
     compile 'com.amazonaws:aws-java-sdk-sqs'
     compile 'com.amazonaws:aws-java-sdk-s3'
+    compile 'com.amazonaws:aws-java-sdk-lambda'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 

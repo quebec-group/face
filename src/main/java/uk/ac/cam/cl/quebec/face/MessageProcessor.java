@@ -4,10 +4,10 @@ import org.opencv.core.*;
 import org.opencv.face.Face;
 import org.opencv.face.FaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
+import uk.ac.cam.cl.quebec.face.aws.S3AssetDownloader;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
 import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
-import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 
