@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.Exception;
 import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
@@ -24,7 +24,7 @@ public class FaceDaemon
     private List<Message> tempQueue;
     private int currentMsg;
 
-    public FaceDaemon(String queueUrl) throws FaceException {
+    public FaceDaemon(String queueUrl) throws Exception {
         mQueueUrl = queueUrl;
 
         tempQueue = makeDummyMessageQueue();
@@ -45,7 +45,7 @@ public class FaceDaemon
         return queue;
     }
 
-    private void connectToQueue() throws FaceException
+    private void connectToQueue() throws Exception
     {
         // TODO: Actually connect to the SQS queue here
     }
@@ -70,7 +70,7 @@ public class FaceDaemon
             try {
                 job.visit(processor);
             }
-            catch (FaceException e) {
+            catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -93,7 +93,7 @@ public class FaceDaemon
             System.err.println();
             printUsage();
         }
-        catch (FaceException fe) {
+        catch (Exception fe) {
             fe.printStackTrace();
         }
     }

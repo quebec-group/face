@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face.messages;
 
 import uk.ac.cam.cl.quebec.face.MessageVisitor;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.Exception;
 
 /**
  * Message sent to us when a new photo is uploaded.
@@ -27,7 +27,7 @@ public class AddPhotoMessage implements Message
     }
 
     @Override
-    public void visit(MessageVisitor visitor) throws FaceException {
+    public void visit(MessageVisitor visitor) throws Exception {
         visitor.accept(this);
     }
 }

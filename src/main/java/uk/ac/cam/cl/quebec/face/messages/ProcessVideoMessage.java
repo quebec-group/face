@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face.messages;
 
 import uk.ac.cam.cl.quebec.face.MessageVisitor;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.Exception;
 
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class ProcessVideoMessage implements Message
     private Set<Integer> recognitionImageSet;
 
     @Override
-    public void visit(MessageVisitor visitor) throws FaceException {
+    public void visit(MessageVisitor visitor) throws Exception {
         visitor.accept(this);
     }
 }
