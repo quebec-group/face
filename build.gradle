@@ -19,6 +19,23 @@ repositories {
     mavenCentral()
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.0.RC2"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.10.47'
+    }
+}
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
@@ -31,5 +48,8 @@ dependencies {
 //    testCompile "junit:junit:4.11"
 
     compile group: 'org.opencv', name: 'opencv', version: '3.2.0'
+    compile 'com.amazonaws:aws-java-sdk-sqs'
+    compile 'com.amazonaws:aws-java-sdk-s3'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
