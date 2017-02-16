@@ -41,7 +41,7 @@ public class FaceDaemon
     List<Message> tempQueue = new ArrayList<>();
     int currentMsg = 0;
 
-    private void connectToQueue()
+    private void connectToQueue() throws FaceException
     {
         tempQueue.add(new AddPhotoMessage(0, 3, "img/training/0/0.jpg"));
         tempQueue.add(new AddPhotoMessage(1, 3, "img/training/0/1.jpg"));
@@ -98,8 +98,9 @@ public class FaceDaemon
         {
             daemon.connectToQueue();
         }
-        catch (Exception e) // TODO: Make this more specific when we know what exceptions can be thrown
+        catch (FaceException e)
         {
+            e.printStackTrace();
         }
 
         daemon.run();
