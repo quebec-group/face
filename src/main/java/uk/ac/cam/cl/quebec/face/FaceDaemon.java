@@ -18,22 +18,10 @@ import java.util.Set;
 public class FaceDaemon
 {
     private String mQueueUrl;
-    private String mQueueUser;
-    private String mQueuePass;
 
     private boolean setQueueUrl(String url)
     {
         mQueueUrl = url;
-        return true;
-    }
-    private boolean setQueueUser(String user)
-    {
-        mQueueUser = user;
-        return true;
-    }
-    private boolean setQueuePass(String password)
-    {
-        mQueuePass = password;
         return true;
     }
 
@@ -88,12 +76,6 @@ public class FaceDaemon
         if (!daemon.setQueueUrl(args[0]))
             printUsage();
 
-        if (!daemon.setQueueUser(args[1]))
-            printUsage();
-
-        if (!daemon.setQueuePass(args[2]))
-            printUsage();
-
         try
         {
             daemon.connectToQueue();
@@ -109,7 +91,7 @@ public class FaceDaemon
     public static void printUsage()
     {
         System.err.println("Background daemon for \"Who's at my Party?\" face detection.");
-        System.err.println("Takes 3 arguments: <QueueUrl> <QueueUser> <QueuePass>");
+        System.err.println("Takes 1 argument: <QueueUrl>");
         Runtime.getRuntime().exit(1);
     }
 }
