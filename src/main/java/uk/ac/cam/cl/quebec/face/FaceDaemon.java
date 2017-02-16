@@ -26,16 +26,24 @@ public class FaceDaemon
     }
 
     // Temporary fake queue
-    List<Message> tempQueue = new ArrayList<>();
+    List<Message> tempQueue = makeDummyMessageQueue();
     int currentMsg = 0;
+
+    private List<Message> makeDummyMessageQueue() {
+        List<Message> queue = new ArrayList<>();
+
+        queue.add(new AddPhotoMessage(0, 3, "img/training/0/0.jpg"));
+        queue.add(new AddPhotoMessage(1, 3, "img/training/0/1.jpg"));
+        Set<Integer> photos1 = new HashSet<>();
+        photos1.add(0);
+        queue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
+
+        return queue;
+    }
 
     private void connectToQueue() throws FaceException
     {
-        tempQueue.add(new AddPhotoMessage(0, 3, "img/training/0/0.jpg"));
-        tempQueue.add(new AddPhotoMessage(1, 3, "img/training/0/1.jpg"));
-        Set<Integer> photos1 = new HashSet<>();
-        photos1.add(0);
-        tempQueue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
+        // TODO: Actually connect to the SQS queue here
     }
 
     private Message getJobFromQueue()
