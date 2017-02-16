@@ -2,6 +2,7 @@ package uk.ac.cam.cl.quebec.face;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
@@ -19,15 +20,18 @@ public class FaceDaemon
 {
     private String mQueueUrl;
 
-    private boolean setQueueUrl(String url)
-    {
-        mQueueUrl = url;
-        return true;
-    }
-
     // Temporary fake queue
-    List<Message> tempQueue = makeDummyMessageQueue();
-    int currentMsg = 0;
+    private List<Message> tempQueue;
+    private int currentMsg;
+
+    public FaceDaemon(String queueUrl) throws FaceException {
+        mQueueUrl = queueUrl;
+
+        tempQueue = makeDummyMessageQueue();
+        currentMsg = 0;
+
+        connectToQueue();
+    }
 
     private List<Message> makeDummyMessageQueue() {
         List<Message> queue = new ArrayList<>();
@@ -76,24 +80,22 @@ public class FaceDaemon
 
     public static void main(String[] args)
     {
-        if (args.length != 3)
+        if (args.length != 1) {
             printUsage();
-
-        FaceDaemon daemon = new FaceDaemon();
-
-        if (!daemon.setQueueUrl(args[0]))
-            printUsage();
-
-        try
-        {
-            daemon.connectToQueue();
-        }
-        catch (FaceException e)
-        {
-            e.printStackTrace();
         }
 
-        daemon.run();
+        try {
+            FaceDaemon daemon = new FaceDaemon(args[0]);
+            daemon.run();
+        }
+        catch (InvalidArgumentException iae) {
+            System.err.println("Invalid argument: " + iae.getMessage());
+            System.err.println();
+            printUsage();
+        }
+        catch (FaceException fe) {
+            fe.printStackTrace();
+        }
     }
 
     public static void printUsage()
