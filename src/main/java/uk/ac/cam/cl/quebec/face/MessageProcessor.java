@@ -5,9 +5,8 @@ import org.opencv.face.Face;
 import org.opencv.face.FaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
-import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 
@@ -31,7 +30,7 @@ public class MessageProcessor implements MessageVisitor
         s3Downloader = downloader;
     }
 
-    public void accept(AddPhotoMessage msg) throws FaceException
+    public void accept(AddPhotoMessage msg) throws QuebecException
     {
         System.out.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
         // Fetch image from S3
@@ -62,7 +61,7 @@ public class MessageProcessor implements MessageVisitor
         recognizer.save(localTrainingFile);
     }
 
-    public void accept(ProcessVideoMessage msg) throws FaceException
+    public void accept(ProcessVideoMessage msg) throws QuebecException
     {
         System.out.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
     }
