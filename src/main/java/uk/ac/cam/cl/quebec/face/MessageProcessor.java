@@ -39,7 +39,7 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(AddPhotoMessage msg) throws QuebecException
     {
-        System.out.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
+        System.err.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
         // Fetch image from S3
         String imgPath = s3Downloader.downloadImage(msg);
 
@@ -69,7 +69,7 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
     {
-        System.out.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
+        System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
 
         // Fetch video from s3
         String videoFileName = s3Downloader.downloadVideo(msg);
@@ -83,7 +83,7 @@ public class MessageProcessor implements MessageVisitor
         // Detect all faces in all frames
         List<Mat> faces = Detect.multipleInVideo(video, 0.0);
 
-        System.out.println("Have " + Integer.toString(faces.size()) + " faces to process.");
+        System.err.println("Have " + Integer.toString(faces.size()) + " faces to process.");
 
         // Prepare face recogniser
         FaceRecognizer recognizer = Face.createLBPHFaceRecognizer();
@@ -97,7 +97,7 @@ public class MessageProcessor implements MessageVisitor
                 .distinct()
                 .collect(Collectors.toList());
 
-        System.out.println(people.toString());
+        System.err.println(people.toString());
     }
 
     private Map.Entry<Integer, Double> getBestMatch(Mat face, FaceRecognizer recognizer) {
