@@ -7,7 +7,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class Detect {
         return filtered;
     }
 
-    private static Mat makeGreyscale(Mat in) throws FaceException{
+    private static Mat makeGreyscale(Mat in) throws QuebecException {
         switch (in.channels()) {
             case 1: {
                 // Already monochrome
@@ -70,7 +70,7 @@ public class Detect {
         }
     }
 
-    public static List<Mat> multipleInVideo(VideoCapture video, double minArea) throws FaceException {
+    public static List<Mat> multipleInVideo(VideoCapture video, double minArea) throws QuebecException {
         List<Mat> retVal = new LinkedList<>();
 
         Mat frame = new Mat();

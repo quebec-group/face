@@ -57,13 +57,13 @@ public class FaceDaemon
         // TODO: Actually connect to the SQS queue here
     }
 
-    private Message getJobFromQueue() throws FaceException
+    private Message getJobFromQueue() throws QuebecException
     {
         if (currentMsg < tempQueue.size()) {
             currentMsg++;
             return tempQueue.get(currentMsg-1);
         }
-        throw new FaceException("End of message queue");
+        throw new QuebecException("End of message queue");
     }
 
     private void run()
