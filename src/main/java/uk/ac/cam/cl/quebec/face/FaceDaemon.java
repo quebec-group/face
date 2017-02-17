@@ -23,7 +23,7 @@ public class FaceDaemon
     // Temporary fake queue
     private List<Message> tempQueue;
     private int currentMsg;
-
+    
     public FaceDaemon(String queueUrl) throws QuebecException {
         mQueueUrl = queueUrl;
 
@@ -44,7 +44,10 @@ public class FaceDaemon
         queue.add(new AddPhotoMessage(10, 1, "img/training/1/0.jpg"));
         queue.add(new AddPhotoMessage(11, 1, "img/training/1/1.jpg"));
         queue.add(new AddPhotoMessage(12, 1, "img/training/1/2.jpg"));
-      
+        queue.add(new AddPhotoMessage(20, 2, "img/training/2/0.jpg"));
+        queue.add(new AddPhotoMessage(21, 2, "img/training/2/1.jpg"));
+        queue.add(new AddPhotoMessage(22, 2, "img/training/2/2.jpg"));
+
         Set<Integer> photos1 = new HashSet<>();
         photos1.add(0);
         queue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
