@@ -1,12 +1,13 @@
 package uk.ac.cam.cl.quebec.face;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,13 +20,15 @@ import java.util.Set;
 public class FaceDaemon
 {
     private String mQueueUrl;
+    private String mStopFilePath;
 
     // Temporary fake queue
     private List<Message> tempQueue;
     private int currentMsg;
-    
-    public FaceDaemon(String queueUrl) throws QuebecException {
+
+    public FaceDaemon(String queueUrl, String stopFilePath) throws QuebecException {
         mQueueUrl = queueUrl;
+        mStopFilePath = stopFilePath;
 
         tempQueue = makeDummyMessageQueue();
         currentMsg = 0;
@@ -60,46 +63,66 @@ public class FaceDaemon
         // TODO: Actually connect to the SQS queue here
     }
 
-    private Message getJobFromQueue() throws QuebecException
+    // Blocks on queue, waiting for messages until timeout (secs) expires
+    private Message getJobFromQueue(int timeout) throws QuebecException
     {
         if (currentMsg < tempQueue.size()) {
             currentMsg++;
             return tempQueue.get(currentMsg-1);
         }
-        throw new QuebecException("End of message queue");
+
+        try {
+            File stopFile = new File(mStopFilePath);
+            stopFile.createNewFile();
+        }
+        catch (IOException e) {
+            throw new QuebecException("Error creating stop file to terminate daemon.");
+        }
+        return null;
     }
 
     private void run()
     {
+        File stopFile = new File(mStopFilePath);
         while (true)
         {
-            S3AssetDownloader downloader = new S3AssetDownloader();
-            try {
-                MessageProcessor processor = new MessageProcessor(downloader);
-                Message job = getJobFromQueue();
+            if (stopFile.exists()) {
+                // Die gracefully
+                stopFile.delete();
+                break;
+            }
 
-                job.visit(processor);
+            fetchAndProcessMessage(30);
+        }
+    }
+
+    private void fetchAndProcessMessage(int timeout) {
+        S3AssetDownloader downloader = new S3AssetDownloader();
+        try {
+            Message job = getJobFromQueue(timeout);
+            if (job == null) {
+                return;
             }
-            catch (QuebecException e) {
-                if (e.getMessage().equals("End of message queue")) {
-                    break;
-                }
-                e.printStackTrace();
-            }
-            finally {
-                downloader.cleanupTempFiles();
-            }
+
+            MessageProcessor processor = new MessageProcessor(downloader);
+            job.visit(processor);
+        }
+        catch (QuebecException e) {
+            e.printStackTrace();
+        }
+        finally {
+            downloader.cleanupTempFiles();
         }
     }
 
     public static void main(String[] args)
     {
-        if (args.length != 1) {
+        if (args.length != 2) {
             printUsage();
         }
 
         try {
-            FaceDaemon daemon = new FaceDaemon(args[0]);
+            FaceDaemon daemon = new FaceDaemon(args[0], args[1]);
             daemon.run();
         }
         catch (InvalidArgumentException iae) {
@@ -115,7 +138,7 @@ public class FaceDaemon
     public static void printUsage()
     {
         System.err.println("Background daemon for \"Who's at my Party?\" face detection.");
-        System.err.println("Takes 1 argument: <QueueUrl>");
+        System.err.println("Takes 2 arguments: <QueueUrl> <StopFile>");
         Runtime.getRuntime().exit(1);
     }
 }
