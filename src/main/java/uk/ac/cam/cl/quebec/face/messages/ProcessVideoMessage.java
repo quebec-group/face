@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face.messages;
 
 import uk.ac.cam.cl.quebec.face.MessageVisitor;
-import uk.ac.cam.cl.quebec.face.exceptions.FaceException;
+import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
 import java.util.Set;
 
@@ -10,10 +10,11 @@ import java.util.Set;
  */
 public class ProcessVideoMessage implements Message
 {
-    public ProcessVideoMessage(int videoId, String S3FilePath, Set<Integer> recognitionImageSet) {
+    public ProcessVideoMessage(int eventId, int videoId, String localFilePath, Set<Integer> recognitionImageSet) {
+        this.eventId = eventId;
         this.videoId = videoId;
         this.recognitionImageSet = recognitionImageSet;
-        this.S3FilePath = S3FilePath;
+        this.localFilePath = localFilePath;
     }
 
     public Set<Integer> getRecognitionImageSet() {
@@ -24,16 +25,21 @@ public class ProcessVideoMessage implements Message
         return videoId;
     }
 
-    public String getS3FilePath() {
-        return S3FilePath;
+    public String getLocalFilePath() {
+        return localFilePath;
     }
 
+    public int getEventId() {
+        return eventId;
+    }
+
+    private int eventId;
     private int videoId;
-    private String S3FilePath;
+    private String localFilePath;
     private Set<Integer> recognitionImageSet;
 
     @Override
-    public void visit(MessageVisitor visitor) throws FaceException {
+    public void visit(MessageVisitor visitor) throws QuebecException {
         visitor.accept(this);
     }
 }
