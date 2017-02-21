@@ -53,7 +53,7 @@ public class FaceDaemon
 
         Set<Integer> photos1 = new HashSet<>();
         photos1.add(0);
-        queue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
+        queue.add(new ProcessVideoMessage(11, 1, "img/video/1.mp4", photos1));
 
         return queue;
     }
