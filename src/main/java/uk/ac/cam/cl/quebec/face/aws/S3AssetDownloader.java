@@ -2,13 +2,11 @@ package uk.ac.cam.cl.quebec.face.aws;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 
 import java.io.File;
@@ -23,13 +21,13 @@ public class S3AssetDownloader {
     private List<File> tempFiles = new ArrayList<>();
 
     public String downloadVideo(ProcessVideoMessage msg) {
-        File video = downloadS3File(msg.getS3FilePath());
+        File video = downloadS3File(msg.getLocalFilePath());
         tempFiles.add(video);
         return video.getPath();
     }
 
-    public String downloadImage(AddPhotoMessage msg) {
-        File video = downloadS3File(msg.getS3FilePath());
+    public String downloadImage(TrainOnVideoMessage msg) {
+        File video = downloadS3File(msg.getLocalFilePath());
         tempFiles.add(video);
         return video.getPath();
     }
