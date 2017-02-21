@@ -1,7 +1,8 @@
 package uk.ac.cam.cl.quebec.face;
 
+import uk.ac.cam.cl.quebec.face.config.Config;
+import uk.ac.cam.cl.quebec.face.config.ConfigLoader;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
@@ -19,16 +20,14 @@ import java.util.Set;
  */
 public class FaceDaemon
 {
-    private String mQueueUrl;
-    private String mStopFilePath;
+    private Config mConfig;
 
     // Temporary fake queue
     private List<Message> tempQueue;
     private int currentMsg;
 
-    public FaceDaemon(String queueUrl, String stopFilePath) throws QuebecException {
-        mQueueUrl = queueUrl;
-        mStopFilePath = stopFilePath;
+    public FaceDaemon(Config config) throws QuebecException {
+        mConfig = config;
 
         tempQueue = makeDummyMessageQueue();
         currentMsg = 0;
@@ -72,7 +71,7 @@ public class FaceDaemon
         }
 
         try {
-            File stopFile = new File(mStopFilePath);
+            File stopFile = new File(mConfig.StopFilePath);
             stopFile.createNewFile();
         }
         catch (IOException e) {
@@ -83,7 +82,7 @@ public class FaceDaemon
 
     private void run()
     {
-        File stopFile = new File(mStopFilePath);
+        File stopFile = new File(mConfig.StopFilePath);
         while (true)
         {
             if (stopFile.exists()) {
@@ -117,18 +116,14 @@ public class FaceDaemon
 
     public static void main(String[] args)
     {
-        if (args.length != 2) {
+        if (args.length != 1) {
             printUsage();
         }
 
         try {
-            FaceDaemon daemon = new FaceDaemon(args[0], args[1]);
+            Config config = ConfigLoader.load(args[0]);
+            FaceDaemon daemon = new FaceDaemon(config);
             daemon.run();
-        }
-        catch (InvalidArgumentException iae) {
-            System.err.println("Invalid argument: " + iae.getMessage());
-            System.err.println();
-            printUsage();
         }
         catch (QuebecException fe) {
             fe.printStackTrace();
@@ -138,7 +133,7 @@ public class FaceDaemon
     public static void printUsage()
     {
         System.err.println("Background daemon for \"Who's at my Party?\" face detection.");
-        System.err.println("Takes 2 arguments: <QueueUrl> <StopFile>");
+        System.err.println("Takes 1 argument: <ConfigFile>");
         Runtime.getRuntime().exit(1);
     }
 }
