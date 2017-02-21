@@ -4,14 +4,17 @@ import org.opencv.core.*;
 import org.opencv.face.Face;
 import org.opencv.face.FaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
+import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
 
@@ -23,6 +26,10 @@ public class MessageProcessor implements MessageVisitor
     static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
     private static final String localTrainingFile = "/tmp/opencv-training.yaml";
+    private static final double recognitionThreshold = 50;
+    private static final int minDetectWidth = 30;
+    private static final int minDetectHeight = 30;
+    private static final int minNumberOfFramesMatching = 5;
 
     private S3AssetDownloader s3Downloader;
 
@@ -32,7 +39,7 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(AddPhotoMessage msg) throws QuebecException
     {
-        System.out.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
+        System.err.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
         // Fetch image from S3
         String imgPath = s3Downloader.downloadImage(msg);
 
@@ -44,7 +51,6 @@ public class MessageProcessor implements MessageVisitor
 
         // Detect the single largest face
         Rect facePosition = Detect.singleInGreyscaleImage(imageInput);
-        System.out.println(facePosition.toString());
         Mat face = imageInput.submat(facePosition);
 
         // Train the global recogniser on the new face
@@ -63,6 +69,52 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
     {
-        System.out.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
+        System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
+
+        // Fetch video from s3
+        String videoFileName = s3Downloader.downloadVideo(msg);
+
+        // Load video
+        VideoCapture video = new VideoCapture(videoFileName);
+        if (!video.isOpened()) {
+            throw new VideoLoadException("Failed to open video file for reading");
+        }
+
+        // Detect all faces in all frames
+        List<Mat> faces = Detect.multipleInVideo(video, 0.0)
+                .stream()
+                .filter(m -> m.cols() > minDetectWidth && m.rows() > minDetectHeight)
+                .collect(Collectors.toList());
+
+        System.err.println("Have " + Integer.toString(faces.size()) + " faces to process.");
+
+        // Prepare face recogniser
+        FaceRecognizer recognizer = Face.createLBPHFaceRecognizer();
+        recognizer.load(localTrainingFile);
+
+        // Recognise people!
+        List<Map.Entry<Integer, Double>> matches = faces.stream()
+                .map(f -> getBestMatch(f, recognizer))
+                .filter(p -> p.getValue() > recognitionThreshold)
+                .collect(Collectors.toList());
+
+        Map<Integer, Integer> map = new HashMap<>();
+        for (Map.Entry<Integer, Double> i : matches) {
+            map.compute(i.getKey(), (k, v) -> (v == null) ? 1 : v + 1);
+        }
+
+        System.err.println(matches.toString());
+        System.err.println(map.entrySet().stream()
+                .filter(e -> e.getValue() > minNumberOfFramesMatching)
+                .map(e -> e.getKey())
+                .collect(Collectors.toList()));
+
+    }
+
+    private Map.Entry<Integer, Double> getBestMatch(Mat face, FaceRecognizer recognizer) {
+        int labs[] = new int[1];
+        double confidence[] = new double[1];
+        recognizer.predict(face, labs, confidence);
+        return new AbstractMap.SimpleEntry<>(labs[0], confidence[0]);
     }
 }
