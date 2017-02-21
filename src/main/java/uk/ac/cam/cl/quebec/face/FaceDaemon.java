@@ -2,7 +2,7 @@ package uk.ac.cam.cl.quebec.face;
 
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 
@@ -39,17 +39,17 @@ public class FaceDaemon
     private List<Message> makeDummyMessageQueue() {
         List<Message> queue = new ArrayList<>();
 
-        queue.add(new AddPhotoMessage(0, 0, "img/training/0/0.jpg"));
-        queue.add(new AddPhotoMessage(1, 0, "img/training/0/1.jpg"));
-        queue.add(new AddPhotoMessage(2, 0, "img/training/0/2.jpg"));
-        queue.add(new AddPhotoMessage(3, 0, "img/training/0/3.jpg"));
-        queue.add(new AddPhotoMessage(4, 0, "img/training/0/4.jpg"));
-        queue.add(new AddPhotoMessage(10, 1, "img/training/1/0.jpg"));
-        queue.add(new AddPhotoMessage(11, 1, "img/training/1/1.jpg"));
-        queue.add(new AddPhotoMessage(12, 1, "img/training/1/2.jpg"));
-        queue.add(new AddPhotoMessage(20, 2, "img/training/2/0.jpg"));
-        queue.add(new AddPhotoMessage(21, 2, "img/training/2/1.jpg"));
-        queue.add(new AddPhotoMessage(22, 2, "img/training/2/2.jpg"));
+        queue.add(new TrainOnVideoMessage(0, 0, "img/training/0/0.jpg"));
+        queue.add(new TrainOnVideoMessage(1, 0, "img/training/0/1.jpg"));
+        queue.add(new TrainOnVideoMessage(2, 0, "img/training/0/2.jpg"));
+        queue.add(new TrainOnVideoMessage(3, 0, "img/training/0/3.jpg"));
+        queue.add(new TrainOnVideoMessage(4, 0, "img/training/0/4.jpg"));
+        queue.add(new TrainOnVideoMessage(10, 1, "img/training/1/0.jpg"));
+        queue.add(new TrainOnVideoMessage(11, 1, "img/training/1/1.jpg"));
+        queue.add(new TrainOnVideoMessage(12, 1, "img/training/1/2.jpg"));
+        queue.add(new TrainOnVideoMessage(20, 2, "img/training/2/0.jpg"));
+        queue.add(new TrainOnVideoMessage(21, 2, "img/training/2/1.jpg"));
+        queue.add(new TrainOnVideoMessage(22, 2, "img/training/2/2.jpg"));
 
         Set<Integer> photos1 = new HashSet<>();
         photos1.add(0);
