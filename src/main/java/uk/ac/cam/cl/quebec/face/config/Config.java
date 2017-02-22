@@ -13,4 +13,13 @@ public class Config {
         StopFilePath = "";
         TrainingFileDir = "";
     }
+
+    @Override
+    public String toString() {
+        return "Config{" +
+                "QueueUrl='" + QueueUrl + '\'' +
+                ", StopFilePath='" + StopFilePath + '\'' +
+                ", TrainingFileDir='" + TrainingFileDir + '\'' +
+                '}';
+    }
 }

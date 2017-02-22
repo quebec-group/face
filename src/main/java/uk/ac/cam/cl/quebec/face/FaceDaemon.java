@@ -2,6 +2,8 @@ package uk.ac.cam.cl.quebec.face;
 
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.config.ConfigLoader;
+import uk.ac.cam.cl.quebec.face.config.ConfigValidationResult;
+import uk.ac.cam.cl.quebec.face.config.ConfigValidator;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
@@ -9,10 +11,7 @@ import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Main class for the FaceDaemon detection daemon.
@@ -121,7 +120,27 @@ public class FaceDaemon
         }
 
         try {
+            // Load config file
             Config config = ConfigLoader.load(args[0]);
+
+            // Validate the provided config
+            ConfigValidator validator = new ConfigValidator(config);
+            List<ConfigValidationResult> validationResults = validator.validate();
+
+            if (validationResults.size() != 0) {
+                // Print out any messages from validation
+                validationResults.forEach(System.out::println);
+
+                // Die now if there was a config error - warning and info are okay
+                ConfigValidationResult worst = validationResults.stream()
+                        .max(new ConfigValidationResult.SeverityRankingComparator())
+                        .get();
+                if (worst.severity == ConfigValidationResult.Severity.ERROR
+                        || worst.severity == ConfigValidationResult.Severity.CRIT) {
+                    return;
+                }
+            }
+
             FaceDaemon daemon = new FaceDaemon(config);
             daemon.run();
         }
