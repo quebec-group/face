@@ -11,15 +11,22 @@ import java.io.*;
  */
 public class ConfigLoader {
     public static Config load(String fileName) throws ConfigException {
+        Config conf;
         try {
             File config = new File(fileName);
             Reader fileReader = new FileReader(config);
 
             Gson gson = new GsonBuilder().create();
-            return gson.fromJson(fileReader, Config.class);
+            conf = gson.fromJson(fileReader, Config.class);
         }
         catch (IOException fnfe) {
             throw new ConfigException("Error opening/reading config file: " + fnfe.getMessage());
         }
+
+        if (conf == null) {
+            throw new ConfigException("Config file is empty");
+        }
+
+        return conf;
     }
 }

@@ -34,3 +34,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 }
 
+task copyRuntimeLibs(type: Copy) {
+    into "lib"
+    from configurations.runtime
+}
+

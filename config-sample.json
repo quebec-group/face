@@ -1,0 +1,5 @@
+{
+  "QueueUrl": "https://queue.queue.sqs.amazon.com",
+  "StopFilePath": "~/face-stop",
+  "TrainingFileDir": "~/face-training-files"
+}

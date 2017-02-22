@@ -16,3 +16,5 @@ img/*-out.jpg
 .gradle/
 .idea/uiDesigner.xml
 .idea/workspace.xml
+.idea/libraries/
+lib/
