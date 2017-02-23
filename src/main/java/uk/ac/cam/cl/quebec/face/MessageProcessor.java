@@ -62,7 +62,9 @@ public class MessageProcessor implements MessageVisitor
         }
 
         Mat labels = new Mat(1, 1, CvType.CV_32SC1);
-        labels.setTo(new Scalar(msg.getUserId()));
+
+        //TODO fix this
+        labels.setTo(new Scalar(Integer.parseInt(msg.getUserId())));
 
         recognizer.update(Collections.singletonList(face), labels);
         recognizer.save(localTrainingFile);

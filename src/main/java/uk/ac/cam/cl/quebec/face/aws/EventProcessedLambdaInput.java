@@ -2,7 +2,7 @@ package uk.ac.cam.cl.quebec.face.aws;
 
 import java.util.List;
 
-public class VideoCallbackInput {
+public class EventProcessedLambdaInput {
 
     private String eventID;
     private List<String> members;
