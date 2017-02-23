@@ -10,6 +10,13 @@ import java.util.Set;
  */
 public class ProcessVideoMessage implements Message
 {
+    private int eventId;
+    private int videoId;
+    private String localFilePath;
+    private Set<Integer> recognitionImageSet;
+
+    private ProcessVideoMessage() {}
+
     public ProcessVideoMessage(int eventId, int videoId, String localFilePath, Set<Integer> recognitionImageSet) {
         this.eventId = eventId;
         this.videoId = videoId;
@@ -33,10 +40,6 @@ public class ProcessVideoMessage implements Message
         return eventId;
     }
 
-    private int eventId;
-    private int videoId;
-    private String localFilePath;
-    private Set<Integer> recognitionImageSet;
 
     @Override
     public void visit(MessageVisitor visitor) throws QuebecException {

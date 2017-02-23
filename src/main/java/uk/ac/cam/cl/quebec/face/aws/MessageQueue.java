@@ -1,31 +1,55 @@
 package uk.ac.cam.cl.quebec.face.aws;
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import uk.ac.cam.cl.quebec.face.messages.WaitMessage;
 
 import java.util.List;
 
-public class RequestManager {
+public class MessageQueue {
+    private static String VIDEO_QUEUE = "https://sqs.eu-west-1.amazonaws.com/926867918335/processing-queue";
 
-    public static String profileQueueURL = "https://sqs.eu-west-1.amazonaws.com/926867918335/profile-picture-uploads";
     private final AmazonSQSClient sqs;
     private final JSONParser parser = new JSONParser();
 
-    public RequestManager() {
+    public MessageQueue() {
         sqs = new AmazonSQSClient(CredentialsManager.getCredentials());
         sqs.setRegion(CredentialsManager.getRegion());
     }
 
-    public void sendMessageToQueue(String queue, String message) {
-        sqs.sendMessage(new SendMessageRequest(queue, message));
+    public uk.ac.cam.cl.quebec.face.messages.Message getMessageIfAvailable() {
+        List<Message> messages = sqs.receiveMessage(VIDEO_QUEUE).getMessages();
+
+        if (messages.isEmpty()) {
+            return new WaitMessage();
+        }
+
+        Message sqsMessage = messages.get(0);
+        uk.ac.cam.cl.quebec.face.messages.Message faceMessage = null;
+        try {
+            JSONObject json = (JSONObject) parser.parse(sqsMessage.getBody());
+
+            String messageType = (String) json.get("type");
+            if (messageType.equals("Training Video")) {
+
+            } else if (messageType.equals("Event Video")) {
+
+            } else {
+                faceMessage = new WaitMessage();
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            faceMessage = new WaitMessage();
+        } finally {
+            sqs.deleteMessage(VIDEO_QUEUE, sqsMessage.getReceiptHandle());
+            return faceMessage;
+        }
     }
 
     public List<Message> getMessages(String queue) {
