@@ -17,7 +17,7 @@ public class ConfigValidator {
     public List<ConfigValidationResult> validate() {
         LinkedList<ConfigValidationResult> results = new LinkedList<>();
 
-        results.addAll(checkStringsNotEmpty("QueueUrl", "StopFilePath", "TrainingFileDir"));
+        results.addAll(checkStringsNotEmpty("QueueUrl", "StopFilePath", "DataDir"));
 
         return results;
     }

@@ -6,12 +6,14 @@ package uk.ac.cam.cl.quebec.face.config;
 public class Config {
     public final String QueueUrl;
     public final String StopFilePath;
-    public final String TrainingFileDir;
+    public final String DataDir;
+    public final String TempFileDir;
 
     Config() {
         QueueUrl = "";
         StopFilePath = "";
-        TrainingFileDir = "";
+        DataDir = "";
+        TempFileDir = "";
     }
 
     @Override
@@ -19,7 +21,8 @@ public class Config {
         return "Config{" +
                 "QueueUrl='" + QueueUrl + '\'' +
                 ", StopFilePath='" + StopFilePath + '\'' +
-                ", TrainingFileDir='" + TrainingFileDir + '\'' +
+                ", DataDir='" + DataDir + '\'' +
+                ", TempFileDir='" + TempFileDir + '\'' +
                 '}';
     }
 }
