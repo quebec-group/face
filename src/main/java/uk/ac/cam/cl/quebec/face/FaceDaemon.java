@@ -1,6 +1,6 @@
 package uk.ac.cam.cl.quebec.face;
 
-import uk.ac.cam.cl.quebec.face.aws.S3AssetDownloader;
+import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
@@ -98,7 +98,7 @@ public class FaceDaemon
     }
 
     private void fetchAndProcessMessage(int timeout) {
-        S3AssetDownloader downloader = new S3AssetDownloader();
+        S3Manager downloader = new S3Manager();
         try {
             Message job = getJobFromQueue(timeout);
             if (job == null) {

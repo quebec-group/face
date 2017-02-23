@@ -11,7 +11,7 @@ import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
-import uk.ac.cam.cl.quebec.face.aws.S3AssetDownloader;
+import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 
 import java.io.File;
 import java.util.*;
@@ -32,9 +32,9 @@ public class MessageProcessor implements MessageVisitor
     private static final int minDetectHeight = 30;
     private static final int minNumberOfFramesMatching = 5;
 
-    private S3AssetDownloader s3Downloader;
+    private S3Manager s3Downloader;
 
-    public MessageProcessor(S3AssetDownloader downloader) {
+    public MessageProcessor(S3Manager downloader) {
         s3Downloader = downloader;
     }
 
