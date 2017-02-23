@@ -1,12 +1,12 @@
 package uk.ac.cam.cl.quebec.face.aws;
 
 import com.amazonaws.services.sqs.AmazonSQSClient;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.WaitMessage;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class MessageQueue {
         sqs.setRegion(CredentialsManager.getRegion());
     }
 
-    public uk.ac.cam.cl.quebec.face.messages.Message getMessageIfAvailable() {
+    public uk.ac.cam.cl.quebec.face.messages.Message getMessage() {
         List<Message> messages = sqs.receiveMessage(VIDEO_QUEUE).getMessages();
 
         if (messages.isEmpty()) {
@@ -31,16 +31,21 @@ public class MessageQueue {
 
         Message sqsMessage = messages.get(0);
         uk.ac.cam.cl.quebec.face.messages.Message faceMessage = null;
+
         try {
             JSONObject json = (JSONObject) parser.parse(sqsMessage.getBody());
 
             String messageType = (String) json.get("type");
-            if (messageType.equals("Training Video")) {
-
-            } else if (messageType.equals("Event Video")) {
-
-            } else {
-                faceMessage = new WaitMessage();
+            switch (messageType) {
+                case "Training Video":
+                    faceMessage = TrainOnVideoMessage.constructFromJson(json);
+                    break;
+                case "Event Video":
+                    faceMessage = ProcessVideoMessage.constructFromJson(json);
+                    break;
+                default:
+                    faceMessage = new WaitMessage();
+                    break;
             }
 
         } catch (ParseException e) {
@@ -48,29 +53,9 @@ public class MessageQueue {
             faceMessage = new WaitMessage();
         } finally {
             sqs.deleteMessage(VIDEO_QUEUE, sqsMessage.getReceiptHandle());
-            return faceMessage;
-        }
-    }
-
-    public List<Message> getMessages(String queue) {
-        System.out.println("Receiving messages from MyQueue.\n");
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queue);
-        return sqs.receiveMessage(receiveMessageRequest).getMessages();
-    }
-
-    public JSONObject getJsonFromMessage(Message message) {
-        JSONObject json = null;
-        try {
-             json = (JSONObject) parser.parse(message.getBody());
-        } catch (ParseException e) {
-            e.printStackTrace();
-            json = new JSONObject();
         }
 
-        return json;
+        return faceMessage;
     }
 
-    public void handleMessage(String queue, String handle) {
-        sqs.deleteMessage(new DeleteMessageRequest(queue, handle));
-    }
 }

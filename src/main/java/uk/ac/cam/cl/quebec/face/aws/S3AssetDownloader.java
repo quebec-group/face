@@ -21,13 +21,13 @@ public class S3AssetDownloader {
     private List<File> tempFiles = new ArrayList<>();
 
     public String downloadVideo(ProcessVideoMessage msg) {
-        File video = downloadS3File(msg.getLocalFilePath());
+        File video = downloadS3File(msg.getS3Path());
         tempFiles.add(video);
         return video.getPath();
     }
 
     public String downloadImage(TrainOnVideoMessage msg) {
-        File video = downloadS3File(msg.getLocalFilePath());
+        File video = downloadS3File(msg.getS3Path());
         tempFiles.add(video);
         return video.getPath();
     }
