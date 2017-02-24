@@ -33,7 +33,18 @@ public class LambdaCaller {
         return eventService.run(input);
     }
 
-    public LambdaOutput profileProcessedLambda(ProfileProcessedLambdaInput input) {
+    public LambdaOutput callProfileProcessedLambda(ProfileProcessedLambdaInput input) {
         return profileService.run(input);
+    }
+
+    public static void main(String[] args) {
+        LambdaCaller caller = new LambdaCaller();
+
+        ProfileProcessedLambdaInput input = new ProfileProcessedLambdaInput();
+
+        input.setS3ID("myS3ID");
+        input.setUserID("2");
+
+        System.out.println(caller.callProfileProcessedLambda(input));
     }
 }

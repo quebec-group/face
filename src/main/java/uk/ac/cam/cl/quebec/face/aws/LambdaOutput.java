@@ -1,39 +1,23 @@
 package uk.ac.cam.cl.quebec.face.aws;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 public class LambdaOutput {
     private boolean succeeded;
     private String errorMessage = "";
 
-
-    public LambdaOutput(String response) {
-        JSONParser parser = new JSONParser();
-
-        try {
-            JSONObject json = (JSONObject) parser.parse(response);
-
-            succeeded = (Boolean) json.getOrDefault("succeeded", Boolean.FALSE);
-
-            if (!succeeded) {
-                errorMessage = (String) json.getOrDefault("errorMessage", "");
-            }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            succeeded = false;
-            errorMessage = e.getMessage();
-        }
-    }
-
-    public boolean didSucceed() {
+    public boolean getSucceeded() {
         return succeeded;
     }
 
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    public void setSucceeded(boolean succeeded) {
+        this.succeeded = succeeded;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     @Override
