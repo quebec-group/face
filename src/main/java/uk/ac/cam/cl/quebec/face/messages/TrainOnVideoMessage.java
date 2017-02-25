@@ -9,17 +9,16 @@ import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 public class TrainOnVideoMessage implements Message
 {
     private int videoId;
-    private int userId;
+    private String userId;
     private String localFilePath;
 
     public int getVideoId() { return videoId; }
     public String getLocalFilePath() { return localFilePath; }
-
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public TrainOnVideoMessage(int videoId, int userId, String filePath)
+    public TrainOnVideoMessage(int videoId, String userId, String filePath)
     {
         this.localFilePath = filePath;
         this.videoId = videoId;
