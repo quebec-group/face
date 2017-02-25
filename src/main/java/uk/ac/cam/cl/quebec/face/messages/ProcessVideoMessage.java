@@ -25,7 +25,6 @@ public class ProcessVideoMessage implements Message
         this.videoId = videoId;
         this.usersToMatch = usersToMatch;
         this.S3Path = S3Path;
->>>>>>> aws
     }
 
     public Set<String> getRecognitionUserSet() {

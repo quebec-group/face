@@ -6,7 +6,6 @@ import uk.ac.cam.cl.quebec.face.config.ConfigLoader;
 import uk.ac.cam.cl.quebec.face.config.ConfigValidationResult;
 import uk.ac.cam.cl.quebec.face.config.ConfigValidator;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;

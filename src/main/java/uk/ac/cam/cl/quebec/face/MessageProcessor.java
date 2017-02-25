@@ -40,7 +40,7 @@ public class MessageProcessor implements MessageVisitor
 
     private static Mat singletonZeroLabel = new Mat(1, 1, CvType.CV_32SC1, new Scalar(0));
 
-    public MessageProcessor(Config config, S3AssetDownloader downloader) {
+    public MessageProcessor(Config config, S3Manager downloader) {
         this.config = config;
         s3Downloader = downloader;
     }
