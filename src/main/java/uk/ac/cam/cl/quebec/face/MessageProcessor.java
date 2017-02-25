@@ -14,7 +14,9 @@ import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
+import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -33,7 +35,7 @@ public class MessageProcessor implements MessageVisitor
     private static final int minDetectHeight = 30;
     private static final int minNumberOfFramesMatching = 5;
 
-    private S3AssetDownloader s3Downloader;
+    private S3Manager s3Downloader;
     private Config config;
 
     private static Mat singletonZeroLabel = new Mat(1, 1, CvType.CV_32SC1, new Scalar(0));
