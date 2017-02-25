@@ -26,7 +26,7 @@ public class ConfigValidationResult {
 
     @Override
     public String toString() {
-        String result = "";
+        String result = "Config ";
 
         switch (severity) {
             case CRIT:

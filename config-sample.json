@@ -1,5 +1,6 @@
 {
   "QueueUrl": "https://queue.queue.sqs.amazon.com",
   "StopFilePath": "/home/pml43/face-stop",
-  "DataDir": "/home/pml43/face-training-files"
+  "DataDir": "/home/pml43/face-training-files",
+  "TempFileDir" : "/tmp/face"
 }
