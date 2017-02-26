@@ -7,7 +7,7 @@ import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 /**
  * Message sent to us when a new video is uploaded for training purposes.
  */
-public class TrainOnVideoMessage implements Message
+public class TrainOnVideoMessage extends S3DataHoldingMessage
 {
     private int videoId;
     private String userId;
@@ -34,7 +34,8 @@ public class TrainOnVideoMessage implements Message
 
         message.userId = (String) json.get("userID");
         //TODO Make sure its actually this
-        message.videoId = Integer.parseInt(message.S3Path.substring(message.S3Path.length() - 6));
+        String basename = message.S3Path.substring(0, message.S3Path.lastIndexOf('.'));
+        message.videoId = Integer.parseInt(basename.substring(basename.length() - 6));
 
         return message;
     }

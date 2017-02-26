@@ -3,6 +3,7 @@ package uk.ac.cam.cl.quebec.face.aws;
 import com.amazonaws.services.lambda.AWSLambdaClient;
 import com.amazonaws.services.lambda.invoke.LambdaFunction;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
+import uk.ac.cam.cl.quebec.face.config.Config;
 
 public class LambdaCaller {
     private AWSLambdaClient client;
@@ -21,8 +22,8 @@ public class LambdaCaller {
     }
 
 
-    public LambdaCaller() {
-        client = new AWSLambdaClient(CredentialsManager.getCredentials());
+    public LambdaCaller(Config config) {
+        client = new AWSLambdaClient(CredentialsManager.getCredentials(config));
         client.setRegion(CredentialsManager.getRegion());
 
         eventService = LambdaInvokerFactory.build(EventProcessedLambdaService.class, client);
@@ -35,16 +36,5 @@ public class LambdaCaller {
 
     public LambdaOutput callProfileProcessedLambda(ProfileProcessedLambdaInput input) {
         return profileService.run(input);
-    }
-
-    public static void main(String[] args) {
-        LambdaCaller caller = new LambdaCaller();
-
-        ProfileProcessedLambdaInput input = new ProfileProcessedLambdaInput();
-
-        input.setS3ID("myS3ID");
-        input.setUserID("2");
-
-        System.out.println(caller.callProfileProcessedLambda(input));
     }
 }

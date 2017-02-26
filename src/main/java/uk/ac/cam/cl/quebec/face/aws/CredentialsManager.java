@@ -5,6 +5,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import uk.ac.cam.cl.quebec.face.config.Config;
 
 public class CredentialsManager {
     private static AWSCredentials credentials;
@@ -22,10 +23,11 @@ public class CredentialsManager {
 
     private CredentialsManager() {}
 
-    static AWSCredentials getCredentials() {
+    static AWSCredentials getCredentials(Config config) {
         if (credentials == null) {
             try {
-                credentials = new ProfileCredentialsProvider(credentialsPath, "default").getCredentials();
+                credentials = new ProfileCredentialsProvider(config.AwsCredentialsFile,
+                        "default").getCredentials();
             } catch (Exception e) {
                 throw new AmazonClientException(
                         "Cannot load the credentials from the credential profiles file. " +

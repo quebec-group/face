@@ -11,16 +11,16 @@ import java.util.HashSet;
 /**
  * Message sent to us when a new video is uploaded.
  */
-public class ProcessVideoMessage implements Message
+public class ProcessVideoMessage extends S3DataHoldingMessage
 {
-    private int eventId;
+    private String eventId;
     private int videoId;
     private String S3Path;
     private Set<String> usersToMatch;
 
     private ProcessVideoMessage() {}
 
-    public ProcessVideoMessage(int eventId, int videoId, String S3Path, Set<String> usersToMatch) {
+    public ProcessVideoMessage(String eventId, int videoId, String S3Path, Set<String> usersToMatch) {
         this.eventId = eventId;
         this.videoId = videoId;
         this.usersToMatch = usersToMatch;
@@ -39,7 +39,7 @@ public class ProcessVideoMessage implements Message
         return S3Path;
     }
 
-    public int getEventId() {
+    public String getEventId() {
         return eventId;
     }
 
@@ -47,10 +47,11 @@ public class ProcessVideoMessage implements Message
         ProcessVideoMessage message = new ProcessVideoMessage();
 
         message.S3Path = (String) json.get("S3ID");
-        message.eventId = Integer.parseInt((String) json.get("eventId"));
+        message.eventId = (String) json.get("eventID");
 
         //TODO Make sure its actually this
-        message.videoId = Integer.parseInt(message.S3Path.substring(message.S3Path.length() - 6));
+        String basename = message.S3Path.substring(0, message.S3Path.lastIndexOf('.'));
+        message.videoId = Integer.parseInt(basename.substring(basename.length() - 6));
 
         message.usersToMatch = new HashSet<>();
         JSONArray usersToMatch = (JSONArray) json.get("usersToMatch");

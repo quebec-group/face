@@ -1,5 +1,7 @@
 {
-  "QueueUrl": "https://queue.queue.sqs.amazon.com",
+  "QueueUrl": "https://sqs.eu-west-1.amazonaws.com/926867918335/processing-queue",
+  "S3Bucket" : "quebec-userfiles-mobilehub-1062763500",
+  "AwsCredentialsFile" : "/home/pml43/face-credentials",
   "StopFilePath": "/home/pml43/face-stop",
   "DataDir": "/home/pml43/face-training-files",
   "TempFileDir" : "/tmp/face"
