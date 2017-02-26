@@ -6,17 +6,24 @@ import org.opencv.face.FaceRecognizer;
 import org.opencv.face.LBPHFaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
+import uk.ac.cam.cl.quebec.face.aws.EventProcessedLambdaInput;
+import uk.ac.cam.cl.quebec.face.aws.LambdaCaller;
+import uk.ac.cam.cl.quebec.face.aws.ProfileProcessedLambdaInput;
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
+import uk.ac.cam.cl.quebec.face.exceptions.StorageException;
 import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
+import uk.ac.cam.cl.quebec.face.storage.DirectoryStructure;
 import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -49,13 +56,16 @@ public class MessageProcessor implements MessageVisitor
     {
         System.err.println("Processing TrainOnVideoMessage: " + Integer.toString(msg.getVideoId()));
         // Fetch image from S3
-        String imgPath = s3Downloader.downloadImage(msg);
+        String videoPath = s3Downloader.downloadFile(msg);
 
         // Load it into memory - all our OpenCV operations operate on greyscale images
-        Mat imageInput = Imgcodecs.imread(imgPath, CV_LOAD_IMAGE_GRAYSCALE);
-        if (imageInput.empty()) {
-            throw new BadImageFormatException("Error opening file " + imgPath);
+        Mat imageInput = new Mat();
+        // TODO: make this more intelligent than taking the first frame and processing
+        VideoCapture video = new VideoCapture(videoPath);
+        if (!video.isOpened()) {
+            throw new VideoLoadException("Failed to open video file for reading");
         }
+        video.retrieve(imageInput, CV_LOAD_IMAGE_GRAYSCALE);
 
         // Detect the single largest face
         Rect facePosition = Detect.singleInGreyscaleImage(imageInput);
@@ -65,6 +75,28 @@ public class MessageProcessor implements MessageVisitor
         LBPHFaceRecognizer recognizer = Face.createLBPHFaceRecognizer();
         recognizer.train(Collections.singletonList(face), singletonZeroLabel);
         TrainingFiles.save(recognizer, config, msg.getUserId());
+
+        // TODO: extract a profile picture from a video and upload to s3 here
+        // For now, use the frame we were working with
+        File tmpDir = DirectoryStructure.getOrMakeTempDirectory(config);
+        File profilePhoto;
+        try {
+            profilePhoto = File.createTempFile("profile", ".jpg", tmpDir);
+        }
+        catch (IOException e) {
+            throw new StorageException("Could not create temp file for profile photo", e);
+        }
+        Imgcodecs.imwrite(profilePhoto.getAbsolutePath(), imageInput);
+        String s3FileName = "protected/" + msg.getUserId() + "/photos/profilePhoto.jpg";
+        s3Downloader.uploadFile(profilePhoto, s3FileName);
+        profilePhoto.delete();
+
+        // Send profile picture back to Amazon
+        ProfileProcessedLambdaInput results = new ProfileProcessedLambdaInput();
+        results.setUserID(msg.getUserId());
+        results.setS3ID(s3FileName);
+        LambdaCaller c = new LambdaCaller(config);
+        c.callProfileProcessedLambda(results);
     }
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
@@ -72,7 +104,7 @@ public class MessageProcessor implements MessageVisitor
         System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
 
         // Fetch video from s3
-        String videoFileName = s3Downloader.downloadVideo(msg);
+        String videoFileName = s3Downloader.downloadFile(msg);
 
         // We create a recogniser here because creation has some interesting failure modes,
         // which will make it pointless to perform the face detection step
@@ -119,11 +151,23 @@ public class MessageProcessor implements MessageVisitor
                 .collect(Collectors.toMap(e -> userMappings.get(e.getKey()), Map.Entry::getValue));
 
         System.err.println(matches.toString());
-        System.err.println(numberOfMatchesById.entrySet().stream()
+
+        List<String> usersInVideo = numberOfMatchesById
+                .entrySet().stream()
                 .filter(e -> e.getValue() > minNumberOfFramesMatching)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
 
+        System.err.println(usersInVideo);
+
+        // TODO: Store results of processing persistently on disk
+
+        // Upload results of processing to Amazon
+        EventProcessedLambdaInput results = new EventProcessedLambdaInput();
+        results.setEventID(msg.getEventId());
+        results.setMembers(usersInVideo);
+        LambdaCaller c = new LambdaCaller(config);
+        c.callEventProcessedLambda(results);
     }
 
     private Map.Entry<Integer, Double> getBestMatch(Mat face, FaceRecognizer recognizer) {

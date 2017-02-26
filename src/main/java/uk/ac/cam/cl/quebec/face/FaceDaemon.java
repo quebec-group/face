@@ -1,5 +1,6 @@
 package uk.ac.cam.cl.quebec.face;
 
+import uk.ac.cam.cl.quebec.face.aws.MessageQueue;
 import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.config.ConfigLoader;
@@ -9,6 +10,7 @@ import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+import uk.ac.cam.cl.quebec.face.messages.WaitMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,7 @@ public class FaceDaemon
     // Temporary fake queue
     private List<Message> tempQueue;
     private int currentMsg;
+    private MessageQueue queue;
 
     public FaceDaemon(Config config) throws QuebecException {
         mConfig = config;
@@ -32,7 +35,7 @@ public class FaceDaemon
         tempQueue = makeDummyMessageQueue();
         currentMsg = 0;
 
-        connectToQueue();
+        queue = new MessageQueue(config);
     }
 
     private List<Message> makeDummyMessageQueue() {
@@ -53,25 +56,35 @@ public class FaceDaemon
         Set<String> photos1 = new HashSet<>();
         photos1.add("Jeremy");
         photos1.add("Richard");
-        queue.add(new ProcessVideoMessage(11, 1, "img/video/0.mp4", photos1));
+        queue.add(new ProcessVideoMessage("11", 1, "img/video/0.mp4", photos1));
 
         Set<String> photos2 = new HashSet<>();
         photos2.add("Jeremy");
         photos2.add("Richard");
         photos2.add("Larry");
-        queue.add(new ProcessVideoMessage(12, 2, "img/video/0.mp4", photos2));
+        queue.add(new ProcessVideoMessage("12", 2, "img/video/0.mp4", photos2));
 
         return queue;
     }
 
-    private void connectToQueue() throws QuebecException
-    {
-        // TODO: Actually connect to the SQS queue here
+    // Blocks on queue, waiting for messages until timeout (secs) expires
+    private Message getJobFromQueue(int timeout) throws QuebecException {
+        // Wait and see if we get a message before timeout
+        Message nextMessage = queue.getMessage();
+        while (timeout != 0 && nextMessage instanceof WaitMessage) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new QuebecException("Interrupted while waiting for a message to process");
+            }
+            timeout--;
+            nextMessage = queue.getMessage();
+        }
+
+        return nextMessage;
     }
 
-    // Blocks on queue, waiting for messages until timeout (secs) expires
-    private Message getJobFromQueue(int timeout) throws QuebecException
-    {
+    private Message getJobFromQueueWhenTesting(int timeout) throws QuebecException {
         if (currentMsg < tempQueue.size()) {
             currentMsg++;
             return tempQueue.get(currentMsg-1);
@@ -103,15 +116,17 @@ public class FaceDaemon
     }
 
     private void fetchAndProcessMessage(int timeout) {
-        S3Manager downloader = new S3Manager();
+        S3Manager downloader = new S3Manager(mConfig);
         try {
             Message job = getJobFromQueue(timeout);
-            if (job == null) {
+            if (job instanceof WaitMessage) {
                 return;
             }
 
             MessageProcessor processor = new MessageProcessor(mConfig, downloader);
             job.visit(processor);
+
+            System.err.println("Done");
         }
         catch (QuebecException e) {
             e.printStackTrace();
