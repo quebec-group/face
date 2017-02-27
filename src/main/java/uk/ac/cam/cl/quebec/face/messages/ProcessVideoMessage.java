@@ -1,12 +1,8 @@
 package uk.ac.cam.cl.quebec.face.messages;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import uk.ac.cam.cl.quebec.face.MessageVisitor;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,66 +10,27 @@ import java.util.Set;
  */
 public class ProcessVideoMessage implements Message
 {
-    private int eventId;
-    private long videoId;
-    private String S3Path;
-    private List<String> usersToMatch;
-    private Set<Integer> recognitionImageSet;
-
-    private ProcessVideoMessage() {}
-
-    public ProcessVideoMessage(int eventId, int videoId, String S3Path, Set<Integer> recognitionImageSet) {
-        this.eventId = eventId;
+    public ProcessVideoMessage(int videoId, String S3FilePath, Set<Integer> recognitionImageSet) {
         this.videoId = videoId;
         this.recognitionImageSet = recognitionImageSet;
-        this.S3Path = S3Path;
+        this.S3FilePath = S3FilePath;
     }
 
     public Set<Integer> getRecognitionImageSet() {
         return recognitionImageSet;
     }
 
-    public long getVideoId() {
+    public int getVideoId() {
         return videoId;
     }
 
-    public String getS3Path() {
-        return S3Path;
+    public String getS3FilePath() {
+        return S3FilePath;
     }
 
-    public int getEventId() {
-        return eventId;
-    }
-
-    public static ProcessVideoMessage constructFromJson(JSONObject json) {
-        ProcessVideoMessage message = new ProcessVideoMessage();
-
-        message.S3Path = (String) json.get("S3ID");
-        message.eventId = Integer.parseInt((String) json.get("eventId"));
-
-        message.videoId = getVideoIDFromS3Path(message.S3Path);
-
-        message.usersToMatch = new ArrayList<>();
-        JSONArray usersToMatch = (JSONArray) json.get("usersToMatch");
-
-        for (Object user : usersToMatch) {
-            if (user instanceof String) {
-                message.usersToMatch.add((String) user);
-            }
-        }
-
-        return message;
-    }
-
-    // File path format protected/cognitoID/videos/VID_yyyyMMdd_HHmmss.mp4
-    private static long getVideoIDFromS3Path(String path) {
-        String numericalPart = path
-                .substring(0, path.lastIndexOf("."))
-                .substring(path.indexOf("VID") + 3)
-                .replaceAll("_","");
-
-        return Long.parseLong(numericalPart);
-    }
+    private int videoId;
+    private String S3FilePath;
+    private Set<Integer> recognitionImageSet;
 
     @Override
     public void visit(MessageVisitor visitor) throws QuebecException {
