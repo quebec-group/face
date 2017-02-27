@@ -15,7 +15,7 @@ import java.util.Set;
 public class ProcessVideoMessage implements Message
 {
     private int eventId;
-    private int videoId;
+    private long videoId;
     private String S3Path;
     private List<String> usersToMatch;
     private Set<Integer> recognitionImageSet;
@@ -33,7 +33,7 @@ public class ProcessVideoMessage implements Message
         return recognitionImageSet;
     }
 
-    public int getVideoId() {
+    public long getVideoId() {
         return videoId;
     }
 
@@ -51,8 +51,7 @@ public class ProcessVideoMessage implements Message
         message.S3Path = (String) json.get("S3ID");
         message.eventId = Integer.parseInt((String) json.get("eventId"));
 
-        //TODO Make sure its actually this
-        message.videoId = Integer.parseInt(message.S3Path.substring(message.S3Path.length() - 6));
+        message.videoId = getVideoIDFromS3Path(message.S3Path);
 
         message.usersToMatch = new ArrayList<>();
         JSONArray usersToMatch = (JSONArray) json.get("usersToMatch");
@@ -64,6 +63,16 @@ public class ProcessVideoMessage implements Message
         }
 
         return message;
+    }
+
+    // File path format protected/cognitoID/videos/VID_yyyyMMdd_HHmmss.mp4
+    private static long getVideoIDFromS3Path(String path) {
+        String numericalPart = path
+                .substring(0, path.lastIndexOf("."))
+                .substring(path.indexOf("VID") + 3)
+                .replaceAll("_","");
+
+        return Long.parseLong(numericalPart);
     }
 
     @Override
