@@ -5,12 +5,13 @@ import org.opencv.face.Face;
 import org.opencv.face.FaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
+import uk.ac.cam.cl.quebec.face.opencv.Detect;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
 import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
-import uk.ac.cam.cl.quebec.face.opencv.Detect;
+import uk.ac.cam.cl.quebec.face.aws.S3Manager;
 
 import java.io.File;
 import java.util.*;
@@ -31,15 +32,15 @@ public class MessageProcessor implements MessageVisitor
     private static final int minDetectHeight = 30;
     private static final int minNumberOfFramesMatching = 5;
 
-    private S3AssetDownloader s3Downloader;
+    private S3Manager s3Downloader;
 
-    public MessageProcessor(S3AssetDownloader downloader) {
+    public MessageProcessor(S3Manager downloader) {
         s3Downloader = downloader;
     }
 
-    public void accept(AddPhotoMessage msg) throws QuebecException
+    public void accept(TrainOnVideoMessage msg) throws QuebecException
     {
-        System.err.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
+        System.err.println("Processing TrainOnVideoMessage: " + Integer.toString(msg.getVideoId()));
         // Fetch image from S3
         String imgPath = s3Downloader.downloadImage(msg);
 
@@ -61,7 +62,9 @@ public class MessageProcessor implements MessageVisitor
         }
 
         Mat labels = new Mat(1, 1, CvType.CV_32SC1);
-        labels.setTo(new Scalar(msg.getUserId()));
+
+        //TODO fix this
+        labels.setTo(new Scalar(Integer.parseInt(msg.getUserId())));
 
         recognizer.update(Collections.singletonList(face), labels);
         recognizer.save(localTrainingFile);
@@ -69,7 +72,7 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
     {
-        System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
+        System.err.println("Processing ProcessVideoMessage: " + msg.getVideoId());
 
         // Fetch video from s3
         String videoFileName = s3Downloader.downloadVideo(msg);
