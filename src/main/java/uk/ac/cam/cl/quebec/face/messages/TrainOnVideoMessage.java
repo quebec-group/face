@@ -9,8 +9,8 @@ import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
  */
 public class TrainOnVideoMessage implements Message
 {
-    private int videoId;
     private String userId;
+    private int videoId;
     private String S3Path;
 
     public int getVideoId() { return videoId; }
@@ -19,6 +19,7 @@ public class TrainOnVideoMessage implements Message
     public String getUserId() {
         return userId;
     }
+
 
     private TrainOnVideoMessage() {}
 
@@ -33,10 +34,8 @@ public class TrainOnVideoMessage implements Message
         TrainOnVideoMessage message = new TrainOnVideoMessage();
 
         message.S3Path = (String) json.get("S3ID");
-
         message.userId = (String) json.get("userID");
-        //TODO Make sure its actually this
-        message.videoId = Integer.parseInt(message.S3Path.substring(message.S3Path.length() - 6));
+        message.videoId = (Integer) json.get("videoID");
 
         return message;
     }
