@@ -33,7 +33,7 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
 
         message.S3Path = (String) json.get("S3ID");
         message.userId = (String) json.get("userID");
-        message.videoId = (Integer) json.get("videoID");
+        message.videoId = getInt(json, "videoID");
 
         return message;
     }

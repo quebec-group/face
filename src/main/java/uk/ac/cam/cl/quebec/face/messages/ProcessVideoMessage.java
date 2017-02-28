@@ -66,12 +66,4 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
     public void visit(MessageVisitor visitor) throws QuebecException {
         visitor.accept(this);
     }
-
-    private static int getInt(JSONObject params, String key) {
-        if (params.containsKey(key) && params.get(key) instanceof Number) {
-            return ((Number) params.get(key)).intValue();
-        }
-
-        return -1;
-    }
 }
