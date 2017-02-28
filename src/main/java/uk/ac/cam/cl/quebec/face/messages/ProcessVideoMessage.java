@@ -13,14 +13,14 @@ import java.util.HashSet;
  */
 public class ProcessVideoMessage extends S3DataHoldingMessage
 {
-    private String eventId;
+    private int eventId;
     private int videoId;
     private String S3Path;
     private Set<String> usersToMatch;
 
     private ProcessVideoMessage() {}
 
-    public ProcessVideoMessage(String eventId, int videoId, String S3Path, Set<String> usersToMatch) {
+    public ProcessVideoMessage(int eventId, int videoId, String S3Path, Set<String> usersToMatch) {
         this.eventId = eventId;
         this.videoId = videoId;
         this.usersToMatch = usersToMatch;
@@ -39,7 +39,7 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
         return S3Path;
     }
 
-    public String getEventId() {
+    public int getEventId() {
         return eventId;
     }
 
@@ -47,11 +47,8 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
         ProcessVideoMessage message = new ProcessVideoMessage();
 
         message.S3Path = (String) json.get("S3ID");
-        message.eventId = (String) json.get("eventID");
-
-        //TODO Make sure its actually this
-        String basename = message.S3Path.substring(0, message.S3Path.lastIndexOf('.'));
-        message.videoId = Integer.parseInt(basename.substring(basename.length() - 6));
+        message.eventId = (Integer) json.get("eventID");
+        message.videoId = (Integer) json.get("videoID");
 
         message.usersToMatch = new HashSet<>();
         JSONArray usersToMatch = (JSONArray) json.get("usersToMatch");

@@ -9,8 +9,8 @@ import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
  */
 public class TrainOnVideoMessage extends S3DataHoldingMessage
 {
-    private int videoId;
     private String userId;
+    private int videoId;
     private String S3Path;
 
     public int getVideoId() { return videoId; }
@@ -18,6 +18,7 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
     public String getUserId() {
         return userId;
     }
+
 
     private TrainOnVideoMessage() {}
     public TrainOnVideoMessage(int videoId, String userId, String filePath)
@@ -31,11 +32,8 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
         TrainOnVideoMessage message = new TrainOnVideoMessage();
 
         message.S3Path = (String) json.get("S3ID");
-
         message.userId = (String) json.get("userID");
-        //TODO Make sure its actually this
-        String basename = message.S3Path.substring(0, message.S3Path.lastIndexOf('.'));
-        message.videoId = Integer.parseInt(basename.substring(basename.length() - 6));
+        message.videoId = (Integer) json.get("videoID");
 
         return message;
     }
