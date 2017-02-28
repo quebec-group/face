@@ -47,8 +47,8 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
         ProcessVideoMessage message = new ProcessVideoMessage();
 
         message.S3Path = (String) json.get("S3ID");
-        message.eventId = (Integer) json.get("eventID");
-        message.videoId = (Integer) json.get("videoID");
+        message.eventId = getInt(json, "eventID");
+        message.videoId = getInt(json, "videoID");
 
         message.usersToMatch = new HashSet<>();
         JSONArray usersToMatch = (JSONArray) json.get("usersToMatch");
@@ -65,5 +65,13 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
     @Override
     public void visit(MessageVisitor visitor) throws QuebecException {
         visitor.accept(this);
+    }
+
+    private static int getInt(JSONObject params, String key) {
+        if (params.containsKey(key) && params.get(key) instanceof Number) {
+            return ((Number) params.get(key)).intValue();
+        }
+
+        return -1;
     }
 }
