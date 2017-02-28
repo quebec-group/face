@@ -182,7 +182,7 @@ public class MessageProcessor implements MessageVisitor
         c.callProfileProcessedLambda(results);
     }
 
-    private void sendEventResultsToLambda(String eventId, List<String> usersInVideo) {
+    private void sendEventResultsToLambda(int eventId, List<String> usersInVideo) {
         EventProcessedLambdaInput results = new EventProcessedLambdaInput();
         results.setEventID(eventId);
         results.setMembers(usersInVideo);

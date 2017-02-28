@@ -56,13 +56,13 @@ public class FaceDaemon
         Set<String> photos1 = new HashSet<>();
         photos1.add("Jeremy");
         photos1.add("Richard");
-        queue.add(new ProcessVideoMessage("11", 1, "img/video/0.mp4", photos1));
+        queue.add(new ProcessVideoMessage(11, 1, "img/video/0.mp4", photos1));
 
         Set<String> photos2 = new HashSet<>();
         photos2.add("Jeremy");
         photos2.add("Richard");
         photos2.add("Larry");
-        queue.add(new ProcessVideoMessage("12", 2, "img/video/0.mp4", photos2));
+        queue.add(new ProcessVideoMessage(12, 2, "img/video/0.mp4", photos2));
 
         return queue;
     }
