@@ -46,7 +46,7 @@ public class VideoTrainer {
                 .filter(f -> f.getFacePosition().area() > 1000)
                 .collect(Collectors.toList());
 
-        System.err.println(interestingFrames.size() + " frames accepted.");
+        System.err.println(interestingFrames.size() + " frames accepted as viable for training. Choosing " + (int)maxFramesPerVideo);
 
         // Decide which frames to use
         List<FrameInspectionSummary> framesToUse = selectFramesFromCandidates(interestingFrames, allFrames.size());
@@ -84,7 +84,7 @@ public class VideoTrainer {
                 // Find nearest frame to frameNum which is available
                 int closestIndex = findClosestFrameIn(availableFrames, frameNum, currentIndex);
 
-                System.err.println(framesToUse.add(availableFrames.get(closestIndex)));
+                framesToUse.add(availableFrames.get(closestIndex));
                 availableFrames.remove(closestIndex);
                 if (closestIndex > 0) {
                     closestIndex--;

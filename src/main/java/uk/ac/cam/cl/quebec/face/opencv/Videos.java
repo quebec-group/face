@@ -37,8 +37,6 @@ public class Videos {
             frameNumber++;
 
             frames.add(summary);
-
-            System.err.println("var=" + summary.getLaplacianVariance() + "  area=" + summary.getFacePosition().area());
         }
 
         video.release();
