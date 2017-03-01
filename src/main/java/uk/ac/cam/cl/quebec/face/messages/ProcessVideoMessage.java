@@ -29,11 +29,6 @@ public class ProcessVideoMessage implements Message
         return localFilePath;
     }
 
-    public int getEventId() {
-        return eventId;
-    }
-
-    private int eventId;
     private int videoId;
     private String localFilePath;
     private Set<String> recognitionUserSet;
