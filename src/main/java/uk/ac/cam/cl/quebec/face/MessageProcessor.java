@@ -1,9 +1,7 @@
 package uk.ac.cam.cl.quebec.face;
 
 import org.opencv.core.*;
-import org.opencv.face.Face;
 import org.opencv.face.FaceRecognizer;
-import org.opencv.face.LBPHFaceRecognizer;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.aws.EventProcessedLambdaInput;
@@ -15,7 +13,7 @@ import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
-import uk.ac.cam.cl.quebec.face.opencv.Detect;
+import uk.ac.cam.cl.quebec.face.opencv.*;
 import uk.ac.cam.cl.quebec.face.storage.DirectoryStructure;
 import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 import uk.ac.cam.cl.quebec.face.aws.S3Manager;
@@ -25,8 +23,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
 
 /**
  * Central visitor which handles correct processing of all messages.
@@ -43,8 +39,6 @@ public class MessageProcessor implements MessageVisitor
     private S3Manager s3Manager;
     private Config config;
 
-    private static Mat singletonZeroLabel = new Mat(1, 1, CvType.CV_32SC1, new Scalar(0));
-
     public MessageProcessor(Config config, S3Manager downloader) {
         this.config = config;
         s3Manager = downloader;
@@ -53,33 +47,16 @@ public class MessageProcessor implements MessageVisitor
     public void accept(TrainOnVideoMessage msg) throws QuebecException
     {
         System.err.println("Processing TrainOnVideoMessage: " + Integer.toString(msg.getVideoId()));
-        // Fetch image from S3
+
+        // Fetch video from S3
         String videoPath = s3Manager.downloadFile(msg);
 
-        // Load it into memory - all our OpenCV operations operate on greyscale images
-        Mat imageInput = new Mat();
-        // TODO: make this more intelligent than taking the first frame and processing
-        VideoCapture video = new VideoCapture(videoPath);
-        if (!video.isOpened()) {
-            throw new VideoLoadException("Failed to open video file for reading");
-        }
-        video.retrieve(imageInput, CV_LOAD_IMAGE_GRAYSCALE);
+        // Perform the training
+        VideoTrainer trainer = new VideoTrainer(config,msg.getUserId(), videoPath);
+        trainer.train();
 
-        // Detect the single largest face
-        Rect facePosition = Detect.singleInGreyscaleImage(imageInput);
-        Mat face = imageInput.submat(facePosition);
-
-        // Train a recogniser on the new face
-        LBPHFaceRecognizer recognizer = Face.createLBPHFaceRecognizer();
-        recognizer.train(Collections.singletonList(face), singletonZeroLabel);
-        TrainingFiles.save(recognizer, config, msg.getUserId());
-
-        // TODO: extract a profile picture from a video and upload to s3 here
-        // For now, use the frame we were working with
-        String s3FileName = uploadProfilePhoto(msg.getUserId(), imageInput);
-
-        // Send profile picture back to Amazon
-        sendTrainingResultsToLambda(msg.getUserId(), s3FileName);
+        // Ping lambda to say we're done
+        sendTrainingResultsToLambda(msg.getUserId(), msg.getVideoId());
     }
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
@@ -174,10 +151,10 @@ public class MessageProcessor implements MessageVisitor
         return s3FileName;
     }
 
-    private void sendTrainingResultsToLambda(String userId, String s3FileName) {
+    private void sendTrainingResultsToLambda(String userId, int videoId) {
         ProfileProcessedLambdaInput results = new ProfileProcessedLambdaInput();
         results.setUserID(userId);
-        results.setS3ID(s3FileName);
+        results.setVideoID(videoId);
         LambdaCaller c = new LambdaCaller(config);
         c.callProfileProcessedLambda(results);
     }
