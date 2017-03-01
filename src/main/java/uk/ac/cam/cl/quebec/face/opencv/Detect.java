@@ -3,10 +3,8 @@ package uk.ac.cam.cl.quebec.face.opencv;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
 import java.util.LinkedList;
@@ -52,30 +50,12 @@ public class Detect {
         return filtered;
     }
 
-    private static Mat makeGreyscale(Mat in) throws QuebecException {
-        switch (in.channels()) {
-            case 1: {
-                // Already monochrome
-                return in;
-            }
-            case 3: {
-                // Convert from rgb
-                Mat greyscale = new Mat();
-                Imgproc.cvtColor(in, greyscale, Imgproc.COLOR_BGR2GRAY);
-                return greyscale;
-            }
-            default: {
-                throw new BadImageFormatException("Number of colour channels in image is wrong.");
-            }
-        }
-    }
-
     public static List<Mat> multipleInVideo(VideoCapture video, double minArea) throws QuebecException {
         List<Mat> retVal = new LinkedList<>();
 
         Mat frame = new Mat();
         while (video.read(frame)) {
-            Mat greyscale = makeGreyscale(frame);
+            Mat greyscale = Images.makeGreyscale(frame);
             retVal.addAll(
                     multipleInGreyscaleImage(greyscale, minArea)
                             .stream()
