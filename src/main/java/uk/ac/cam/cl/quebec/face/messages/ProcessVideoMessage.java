@@ -35,8 +35,8 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
         return videoId;
     }
 
-    public String getS3FilePath() {
-        return S3FilePath;
+    public String getS3Path() {
+        return S3Path;
     }
 
     public int getEventId() {
