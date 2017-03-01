@@ -17,7 +17,8 @@ public class ConfigValidator {
     public List<ConfigValidationResult> validate() {
         LinkedList<ConfigValidationResult> results = new LinkedList<>();
 
-        results.addAll(checkStringsNotEmpty("QueueUrl", "StopFilePath", "DataDir", "TempFileDir"));
+        results.addAll(checkStringsNotEmpty("QueueUrl", "StopFilePath",
+                "DataDir", "TempFileDir", "S3Bucket", "AwsCredentialsFile"));
 
         return results;
     }

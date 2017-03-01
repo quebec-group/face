@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 /**
  * Handles all directory structures on disk
  */
-class DirectoryStructure {
-    static File getOrMakeTempDirectory(Config config) throws StorageException {
+public class DirectoryStructure {
+    public static File getOrMakeTempDirectory(Config config) throws StorageException {
         return getOrMakeDirectory(config.TempFileDir);
     }
     static File getOrMakeUserDirectory(Config config, String userId, RecogniserConfigSlug slug)
