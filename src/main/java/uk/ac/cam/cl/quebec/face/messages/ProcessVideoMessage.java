@@ -10,14 +10,15 @@ import java.util.Set;
  */
 public class ProcessVideoMessage implements Message
 {
-    public ProcessVideoMessage(int videoId, String S3FilePath, Set<Integer> recognitionImageSet) {
+    public ProcessVideoMessage(int eventId, int videoId, String localFilePath, Set<String> recognitionImageSet) {
+        this.eventId = eventId;
         this.videoId = videoId;
-        this.recognitionImageSet = recognitionImageSet;
-        this.S3FilePath = S3FilePath;
+        this.recognitionUserSet = recognitionImageSet;
+        this.S3FilePath = localFilePath;
     }
 
-    public Set<Integer> getRecognitionImageSet() {
-        return recognitionImageSet;
+    public Set<String> getRecognitionUserSet() {
+        return recognitionUserSet;
     }
 
     public int getVideoId() {
@@ -28,9 +29,14 @@ public class ProcessVideoMessage implements Message
         return S3FilePath;
     }
 
+    public int getEventId() {
+        return eventId;
+    }
+
+    private int eventId;
     private int videoId;
     private String S3FilePath;
-    private Set<Integer> recognitionImageSet;
+    private Set<String> recognitionUserSet;
 
     @Override
     public void visit(MessageVisitor visitor) throws QuebecException {

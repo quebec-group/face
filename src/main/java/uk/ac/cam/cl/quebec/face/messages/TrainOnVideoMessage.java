@@ -4,25 +4,24 @@ import uk.ac.cam.cl.quebec.face.MessageVisitor;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
 /**
- * Message sent to us when a new photo is uploaded.
+ * Message sent to us when a new video is uploaded for training purposes.
  */
-public class AddPhotoMessage implements Message
+public class TrainOnVideoMessage implements Message
 {
-    private int photoId;
-    private int userId;
+    private int videoId;
+    private String userId;
     private String S3FilePath;
 
-    public int getPhotoId() { return photoId; }
+    public int getVideoId() { return videoId; }
     public String getS3FilePath() { return S3FilePath; }
-
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public AddPhotoMessage(int photoId, int userId, String filePath)
+    public TrainOnVideoMessage(int videoId, String userId, String filePath)
     {
         this.S3FilePath = filePath;
-        this.photoId = photoId;
+        this.videoId = videoId;
         this.userId = userId;
     }
 

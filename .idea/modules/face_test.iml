@@ -11,6 +11,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="face_main" />
     <orderEntry type="library" name="Gradle: org.opencv:opencv:3.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.0" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="face_main" />
 </module>

@@ -1,17 +1,17 @@
 package uk.ac.cam.cl.quebec.face;
 
+import uk.ac.cam.cl.quebec.face.config.Config;
+import uk.ac.cam.cl.quebec.face.config.ConfigLoader;
+import uk.ac.cam.cl.quebec.face.config.ConfigValidationResult;
+import uk.ac.cam.cl.quebec.face.config.ConfigValidator;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.exceptions.InvalidArgumentException;
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.Message;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Main class for the FaceDaemon detection daemon.
@@ -19,16 +19,14 @@ import java.util.Set;
  */
 public class FaceDaemon
 {
-    private String mQueueUrl;
-    private String mStopFilePath;
+    private Config mConfig;
 
     // Temporary fake queue
     private List<Message> tempQueue;
     private int currentMsg;
 
-    public FaceDaemon(String queueUrl, String stopFilePath) throws QuebecException {
-        mQueueUrl = queueUrl;
-        mStopFilePath = stopFilePath;
+    public FaceDaemon(Config config) throws QuebecException {
+        mConfig = config;
 
         tempQueue = makeDummyMessageQueue();
         currentMsg = 0;
@@ -39,21 +37,28 @@ public class FaceDaemon
     private List<Message> makeDummyMessageQueue() {
         List<Message> queue = new ArrayList<>();
 
-        queue.add(new AddPhotoMessage(0, 0, "img/training/0/0.jpg"));
-        queue.add(new AddPhotoMessage(1, 0, "img/training/0/1.jpg"));
-        queue.add(new AddPhotoMessage(2, 0, "img/training/0/2.jpg"));
-        queue.add(new AddPhotoMessage(3, 0, "img/training/0/3.jpg"));
-        queue.add(new AddPhotoMessage(4, 0, "img/training/0/4.jpg"));
-        queue.add(new AddPhotoMessage(10, 1, "img/training/1/0.jpg"));
-        queue.add(new AddPhotoMessage(11, 1, "img/training/1/1.jpg"));
-        queue.add(new AddPhotoMessage(12, 1, "img/training/1/2.jpg"));
-        queue.add(new AddPhotoMessage(20, 2, "img/training/2/0.jpg"));
-        queue.add(new AddPhotoMessage(21, 2, "img/training/2/1.jpg"));
-        queue.add(new AddPhotoMessage(22, 2, "img/training/2/2.jpg"));
+        queue.add(new TrainOnVideoMessage(0, "Jeremy", "img/training/0/0.jpg"));
+        queue.add(new TrainOnVideoMessage(1, "Jeremy", "img/training/0/1.jpg"));
+        queue.add(new TrainOnVideoMessage(2, "Jeremy", "img/training/0/2.jpg"));
+        queue.add(new TrainOnVideoMessage(3, "Jeremy", "img/training/0/3.jpg"));
+        queue.add(new TrainOnVideoMessage(4, "Jeremy", "img/training/0/4.jpg"));
+        queue.add(new TrainOnVideoMessage(10, "Richard", "img/training/1/0.jpg"));
+        queue.add(new TrainOnVideoMessage(11, "Richard", "img/training/1/1.jpg"));
+        queue.add(new TrainOnVideoMessage(12, "Richard", "img/training/1/2.jpg"));
+        queue.add(new TrainOnVideoMessage(20, "Larry", "img/training/2/0.jpg"));
+        queue.add(new TrainOnVideoMessage(21, "Larry", "img/training/2/1.jpg"));
+        queue.add(new TrainOnVideoMessage(22, "Larry", "img/training/2/2.jpg"));
 
-        Set<Integer> photos1 = new HashSet<>();
-        photos1.add(0);
-        queue.add(new ProcessVideoMessage(11, "img/video/1.mp4", photos1));
+        Set<String> photos1 = new HashSet<>();
+        photos1.add("Jeremy");
+        photos1.add("Richard");
+        queue.add(new ProcessVideoMessage(11, 1, "img/video/0.mp4", photos1));
+
+        Set<String> photos2 = new HashSet<>();
+        photos2.add("Jeremy");
+        photos2.add("Richard");
+        photos2.add("Larry");
+        queue.add(new ProcessVideoMessage(12, 2, "img/video/0.mp4", photos2));
 
         return queue;
     }
@@ -72,7 +77,7 @@ public class FaceDaemon
         }
 
         try {
-            File stopFile = new File(mStopFilePath);
+            File stopFile = new File(mConfig.StopFilePath);
             stopFile.createNewFile();
         }
         catch (IOException e) {
@@ -83,7 +88,7 @@ public class FaceDaemon
 
     private void run()
     {
-        File stopFile = new File(mStopFilePath);
+        File stopFile = new File(mConfig.StopFilePath);
         while (true)
         {
             if (stopFile.exists()) {
@@ -104,7 +109,7 @@ public class FaceDaemon
                 return;
             }
 
-            MessageProcessor processor = new MessageProcessor(downloader);
+            MessageProcessor processor = new MessageProcessor(mConfig, downloader);
             job.visit(processor);
         }
         catch (QuebecException e) {
@@ -117,18 +122,34 @@ public class FaceDaemon
 
     public static void main(String[] args)
     {
-        if (args.length != 2) {
+        if (args.length != 1) {
             printUsage();
         }
 
         try {
-            FaceDaemon daemon = new FaceDaemon(args[0], args[1]);
+            // Load config file
+            Config config = ConfigLoader.load(args[0]);
+
+            // Validate the provided config
+            ConfigValidator validator = new ConfigValidator(config);
+            List<ConfigValidationResult> validationResults = validator.validate();
+
+            if (validationResults.size() != 0) {
+                // Print out any messages from validation
+                validationResults.forEach(System.out::println);
+
+                // Die now if there was a config error - warning and info are okay
+                ConfigValidationResult worst = validationResults.stream()
+                        .max(new ConfigValidationResult.SeverityRankingComparator())
+                        .get();
+                if (worst.severity == ConfigValidationResult.Severity.ERROR
+                        || worst.severity == ConfigValidationResult.Severity.CRIT) {
+                    return;
+                }
+            }
+
+            FaceDaemon daemon = new FaceDaemon(config);
             daemon.run();
-        }
-        catch (InvalidArgumentException iae) {
-            System.err.println("Invalid argument: " + iae.getMessage());
-            System.err.println();
-            printUsage();
         }
         catch (QuebecException fe) {
             fe.printStackTrace();
@@ -138,7 +159,7 @@ public class FaceDaemon
     public static void printUsage()
     {
         System.err.println("Background daemon for \"Who's at my Party?\" face detection.");
-        System.err.println("Takes 2 arguments: <QueueUrl> <StopFile>");
+        System.err.println("Takes 1 argument: <ConfigFile>");
         Runtime.getRuntime().exit(1);
     }
 }
