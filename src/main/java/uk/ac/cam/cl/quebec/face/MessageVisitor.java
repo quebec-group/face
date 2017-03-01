@@ -1,8 +1,8 @@
 package uk.ac.cam.cl.quebec.face;
 
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 
 /**
  * Created by plott on 14/02/2017.

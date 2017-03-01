@@ -1,6 +1,5 @@
 package uk.ac.cam.cl.quebec.face.messages;
 
-import org.json.simple.JSONObject;
 import uk.ac.cam.cl.quebec.face.MessageVisitor;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
@@ -23,7 +22,7 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
     private TrainOnVideoMessage() {}
     public TrainOnVideoMessage(int videoId, String userId, String filePath)
     {
-        this.S3Path = filePath;
+        this.S3FilePath = filePath;
         this.videoId = videoId;
         this.userId = userId;
     }
