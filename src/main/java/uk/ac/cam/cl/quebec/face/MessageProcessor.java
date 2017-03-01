@@ -10,8 +10,8 @@ import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.BadImageFormatException;
 import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.Detect;
 import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 
@@ -43,9 +43,9 @@ public class MessageProcessor implements MessageVisitor
         s3Downloader = downloader;
     }
 
-    public void accept(AddPhotoMessage msg) throws QuebecException
+    public void accept(TrainOnVideoMessage msg) throws QuebecException
     {
-        System.err.println("Processing AddPhotoMessage: " + Integer.toString(msg.getPhotoId()));
+        System.err.println("Processing TrainOnVideoMessage: " + Integer.toString(msg.getVideoId()));
         // Fetch image from S3
         String imgPath = s3Downloader.downloadImage(msg);
 

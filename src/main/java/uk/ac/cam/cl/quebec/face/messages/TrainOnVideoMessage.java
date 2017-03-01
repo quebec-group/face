@@ -10,17 +10,17 @@ public class TrainOnVideoMessage implements Message
 {
     private int videoId;
     private String userId;
-    private String localFilePath;
+    private String S3FilePath;
 
     public int getVideoId() { return videoId; }
-    public String getLocalFilePath() { return localFilePath; }
+    public String getS3FilePath() { return S3FilePath; }
     public String getUserId() {
         return userId;
     }
 
     public TrainOnVideoMessage(int videoId, String userId, String filePath)
     {
-        this.localFilePath = filePath;
+        this.S3FilePath = filePath;
         this.videoId = videoId;
         this.userId = userId;
     }

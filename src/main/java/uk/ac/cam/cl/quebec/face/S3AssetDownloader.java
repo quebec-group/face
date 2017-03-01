@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face;
 
-import uk.ac.cam.cl.quebec.face.messages.AddPhotoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
+import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class S3AssetDownloader
         return msg.getS3FilePath();
     }
 
-    public String downloadImage(AddPhotoMessage msg) {
+    public String downloadImage(TrainOnVideoMessage msg) {
         return msg.getS3FilePath();
     }
 

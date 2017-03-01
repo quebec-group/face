@@ -14,7 +14,7 @@ public class ProcessVideoMessage implements Message
         this.eventId = eventId;
         this.videoId = videoId;
         this.recognitionUserSet = recognitionImageSet;
-        this.localFilePath = localFilePath;
+        this.S3FilePath = localFilePath;
     }
 
     public Set<String> getRecognitionUserSet() {
@@ -25,12 +25,17 @@ public class ProcessVideoMessage implements Message
         return videoId;
     }
 
-    public String getLocalFilePath() {
-        return localFilePath;
+    public String getS3FilePath() {
+        return S3FilePath;
     }
 
+    public int getEventId() {
+        return eventId;
+    }
+
+    private int eventId;
     private int videoId;
-    private String localFilePath;
+    private String S3FilePath;
     private Set<String> recognitionUserSet;
 
     @Override
