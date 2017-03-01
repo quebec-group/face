@@ -15,9 +15,7 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
 
     public int getVideoId() { return videoId; }
     public String getS3Path() { return S3Path; }
-    public String getUserId() {
-        return userId;
-    }
+    public String getUserId() { return userId; }
 
 
     private TrainOnVideoMessage() {}

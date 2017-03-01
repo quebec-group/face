@@ -61,7 +61,7 @@ public class MessageProcessor implements MessageVisitor
 
     public void accept(ProcessVideoMessage msg) throws QuebecException
     {
-        System.err.println("Processing ProcessVideoMessage: " + msg.getVideoId());
+        System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
 
         // Fetch video from s3
         String videoFileName = s3Manager.downloadFile(msg);
