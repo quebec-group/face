@@ -57,7 +57,7 @@ public class TrainingFiles {
         tempFile.delete();
     }
 
-    public static LBPHFaceRecognizer createRecogniserForUsers(Config config, Map<Integer, String> userMappings) throws StorageException {
+    public static LBPHFaceRecognizer createRecogniserForUsers(Config config, Map<Integer, String> userMappings) throws QuebecException {
         Set<String> possibleSlugs = null;
         // Don't initialise just yet in case we fail
         LBPHFaceRecognizer recognizer;

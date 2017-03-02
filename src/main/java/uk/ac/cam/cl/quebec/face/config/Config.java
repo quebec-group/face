@@ -11,6 +11,7 @@ public class Config {
     public final String TempFileDir;
     public final String S3Bucket;
     public final String AwsCredentialsFile;
+    public final String LogFile;
 
     Config() {
         QueueUrl = "";
@@ -19,6 +20,7 @@ public class Config {
         TempFileDir = "";
         S3Bucket = "";
         AwsCredentialsFile = "";
+        LogFile = "";
     }
 
     @Override
@@ -30,6 +32,7 @@ public class Config {
                 ", TempFileDir='" + TempFileDir + '\'' +
                 ", S3Bucket='" + S3Bucket + '\'' +
                 ", AwsCredentialsFile='" + AwsCredentialsFile + '\'' +
+                ", LogFile='" + LogFile + '\'' +
                 '}';
     }
 }
