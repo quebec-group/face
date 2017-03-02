@@ -73,6 +73,9 @@ public class TrainingFiles {
             }
         }
 
+        if (possibleSlugs == null) {
+            throw new StorageException("No users were provided to look for");
+        }
         Optional<String> optionalChosenSlug = possibleSlugs.stream().max(Comparator.naturalOrder());
         if (!optionalChosenSlug.isPresent()) {
             throw new StorageException("Cannot find common recogniser settings for all users");
