@@ -64,7 +64,7 @@ public class VideoTrainer {
         while (true) {
             if (closestIndex - 1 >= 0 && frameErrorCondition.apply(closestIndex)) {
                 closestIndex--;
-            } else if (closestIndex + 1 < availableFrames.size() && frameErrorCondition.apply(closestIndex + 1)) {
+            } else if (closestIndex + 1 < availableFrames.size() && !frameErrorCondition.apply(closestIndex + 1)) {
                 closestIndex++;
             } else {
                 return closestIndex;
