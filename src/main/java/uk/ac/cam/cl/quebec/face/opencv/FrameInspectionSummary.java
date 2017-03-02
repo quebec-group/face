@@ -47,7 +47,9 @@ public class FrameInspectionSummary implements Comparable<FrameInspectionSummary
     @Override
     public String toString() {
         return "FrameInspectionSummary{" +
-                "frameNumber=" + frameNumber +
+                "laplacianVariance=" + laplacianVariance +
+                ", facePosition=" + facePosition +
+                ", frameNumber=" + frameNumber +
                 '}';
     }
 

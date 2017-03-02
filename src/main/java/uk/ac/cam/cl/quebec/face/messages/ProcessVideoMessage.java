@@ -63,6 +63,16 @@ public class ProcessVideoMessage extends S3DataHoldingMessage
     }
 
     @Override
+    public String toString() {
+        return "ProcessVideoMessage{" +
+                "eventId=" + eventId +
+                ", videoId=" + videoId +
+                ", S3Path='" + S3Path + '\'' +
+                ", usersToMatch=" + usersToMatch +
+                '}';
+    }
+
+    @Override
     public void visit(MessageVisitor visitor) throws QuebecException {
         visitor.accept(this);
     }

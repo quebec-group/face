@@ -164,6 +164,8 @@ public class FaceDaemon
                 }
             }
 
+            Logging.setupLogger(config);
+
             FaceDaemon daemon = new FaceDaemon(config);
             daemon.run();
         }

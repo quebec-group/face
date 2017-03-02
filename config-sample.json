@@ -4,5 +4,6 @@
   "AwsCredentialsFile" : "/home/pml43/face-credentials",
   "StopFilePath": "/home/pml43/face-stop",
   "DataDir": "/home/pml43/face-training-files",
-  "TempFileDir" : "/tmp/face"
+  "TempFileDir" : "/tmp/face",
+  "LogFile" : "/home/pml43/face.log"
 }

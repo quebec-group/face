@@ -40,4 +40,13 @@ public class TrainOnVideoMessage extends S3DataHoldingMessage
     public void visit(MessageVisitor visitor) throws QuebecException {
         visitor.accept(this);
     }
+
+    @Override
+    public String toString() {
+        return "TrainOnVideoMessage{" +
+                "userId='" + userId + '\'' +
+                ", videoId=" + videoId +
+                ", S3Path='" + S3Path + '\'' +
+                '}';
+    }
 }

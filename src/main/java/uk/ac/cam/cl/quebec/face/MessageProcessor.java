@@ -37,6 +37,8 @@ public class MessageProcessor implements MessageVisitor
     {
         System.err.println("Processing TrainOnVideoMessage: " + Integer.toString(msg.getVideoId()));
 
+        Logging.getLogger().info(msg.toString());
+
         // Fetch video from S3
         String videoPath = s3Manager.downloadFile(msg);
 
@@ -51,6 +53,8 @@ public class MessageProcessor implements MessageVisitor
     public void accept(ProcessVideoMessage msg) throws QuebecException
     {
         System.err.println("Processing ProcessVideoMessage: " + Integer.toString(msg.getVideoId()));
+
+        Logging.getLogger().info(msg.toString());
 
         // Fetch video from s3
         String videoFileName = s3Manager.downloadFile(msg);
