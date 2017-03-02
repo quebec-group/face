@@ -9,6 +9,7 @@ import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.Logging;
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
+import uk.ac.cam.cl.quebec.face.exceptions.StorageException;
 import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 
@@ -125,19 +126,32 @@ public class VideoTrainer {
         }
 
         int currentFrame = 0;
-        for (int processed = 0; processed < frames.size(); processed++) {
+        for (FrameInspectionSummary frame : frames) {
             Mat img = new Mat();
             // Loop through the frames until we get to one we want to train on
-            for (; video.read(img) && currentFrame != frames.get(processed).getFrameNumber(); currentFrame++) ;
+            while (video.read(img)) {
+                if (currentFrame == frame.getFrameNumber()) {
+                    break;
+                }
+                currentFrame++;
+            } 
+            Logging.getLogger().info("Processing frame #" + currentFrame + ", while looking for " + frame.getFrameNumber());
+
+            if (currentFrame != frame.getFrameNumber()) {
+                throw new StorageException("Ran out of video while trying to read frames for training");
+            }
 
             // Get the face in the image
             Mat colourFace = img/*.submat(frames.get(processed).getFacePosition())*/;
+            Logging.getLogger().info("Size of training image is " + colourFace.size().toString());
             Mat face = Images.makeGreyscale(colourFace);
 
             // Train a recogniser on the new face
             LBPHFaceRecognizer recognizer = Face.createLBPHFaceRecognizer();
             recognizer.train(Collections.singletonList(face), singletonZeroLabel);
             TrainingFiles.save(recognizer, config, userId);
+
+            currentFrame++;
         }
     }
 }

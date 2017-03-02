@@ -2,6 +2,7 @@ package uk.ac.cam.cl.quebec.face;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.aws.EventProcessedLambdaInput;
 import uk.ac.cam.cl.quebec.face.aws.LambdaCaller;
@@ -25,6 +26,8 @@ import java.util.*;
  */
 public class MessageProcessor implements MessageVisitor
 {
+    private static final int desiredThumbnailWidth = 640;
+
     static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
     private S3Manager s3Manager;
@@ -66,6 +69,15 @@ public class MessageProcessor implements MessageVisitor
         List<String> usersInVideo = recogniser.recognise();
 
         // Generate thumbnail for video
+        Mat thumbnail = generateThumbnail(videoFileName);
+
+        String S3Path = uploadThumbnail(msg.getVideoId(), thumbnail);
+
+        // Upload results of processing to Amazon
+        sendEventResultsToLambda(msg.getEventId(), msg.getVideoId(), usersInVideo, S3Path);
+    }
+
+    private Mat generateThumbnail(String videoFileName) throws QuebecException {
         VideoCapture video = new VideoCapture(videoFileName);
         if (!video.isOpened()) {
             throw new VideoLoadException("Failed to open video file for reading");
@@ -73,10 +85,17 @@ public class MessageProcessor implements MessageVisitor
 
         Mat thumbnail = new Mat();
         video.read(thumbnail);
-        String S3Path = uploadThumbnail(msg.getVideoId(), thumbnail);
 
-        // Upload results of processing to Amazon
-        sendEventResultsToLambda(msg.getVideoId(), msg.getEventId(), usersInVideo, S3Path);
+        // Resize the thumbnail to a more sane size
+        double thumbnailWidth = thumbnail.size().width;
+        double thumbnailHeight = thumbnail.size().height;
+        double ratio = thumbnailWidth / desiredThumbnailWidth;
+        Size thumbnailSize = new Size(thumbnailWidth / ratio, thumbnailHeight / ratio);
+        Mat minifiedThumbnail = new Mat();
+
+        Imgproc.resize(thumbnail, minifiedThumbnail, thumbnailSize);
+
+        return minifiedThumbnail;
     }
 
     private String uploadThumbnail(int videoId, Mat image) throws StorageException {
