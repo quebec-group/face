@@ -6,6 +6,7 @@ import org.opencv.core.Scalar;
 import org.opencv.face.Face;
 import org.opencv.face.LBPHFaceRecognizer;
 import org.opencv.videoio.VideoCapture;
+import uk.ac.cam.cl.quebec.face.Logging;
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
@@ -13,6 +14,7 @@ import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +44,7 @@ public class VideoTrainer {
 
         // First pass
         List<FrameInspectionSummary> allFrames = Videos.inspectAllFrames(videoPath);
+        Logging.getLogger().info(allFrames.toString());
 
         List<Double> variances = allFrames.stream()
                 .map(FrameInspectionSummary::getLaplacianVariance)
@@ -65,13 +68,17 @@ public class VideoTrainer {
         trainOnSelectedFrames(framesToUse);
     }
 
-    private int findClosestFrameIn(List<FrameInspectionSummary> availableFrames, int idealFrameNum, int previousFrameIndex) {
+    private int findClosestFrameIn(List<FrameInspectionSummary> availableFrames, int idealFrameNum, int previousFrameIndex) throws QuebecException {
+        Logger logger = Logging.getLogger();
+
         final int frameNumber = idealFrameNum;
         Function<Integer, Integer> frameError = index -> Math.abs(availableFrames.get(index).getFrameNumber() - frameNumber);
         Function<Integer, Boolean> frameErrorCondition = index -> frameError.apply(index - 1) < frameError.apply(index);
 
         int closestIndex = previousFrameIndex;
         while (true) {
+            logger.info("Trying index " + closestIndex);
+            logger.info("Frame number is " + availableFrames.get(closestIndex) + ", we were looking for " + idealFrameNum);
             if (closestIndex - 1 >= 0 && frameErrorCondition.apply(closestIndex)) {
                 closestIndex--;
             } else if (closestIndex + 1 < availableFrames.size() && !frameErrorCondition.apply(closestIndex + 1)) {
@@ -82,7 +89,7 @@ public class VideoTrainer {
         }
     }
 
-    private List<FrameInspectionSummary> selectFramesFromCandidates(List<FrameInspectionSummary> candidates, int framesInVideo) {
+    private List<FrameInspectionSummary> selectFramesFromCandidates(List<FrameInspectionSummary> candidates, int framesInVideo) throws QuebecException {
         // We are aiming for a particular number of frames, uniformly distributed
         List<FrameInspectionSummary> framesToUse = new ArrayList<>();
 
