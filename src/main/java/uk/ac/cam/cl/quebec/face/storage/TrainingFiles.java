@@ -62,8 +62,15 @@ public class TrainingFiles {
         // Don't initialise just yet in case we fail
         LBPHFaceRecognizer recognizer;
 
-        for (String userId : userMappings.values()) {
-            Set<String> userSlugs = DirectoryStructure.findAllConfigSlugsForUser(config, userId);
+        List<Integer> toRemove = new ArrayList<>();
+        for (Map.Entry<Integer, String> user : userMappings.entrySet()) {
+            Set<String> userSlugs = DirectoryStructure.findAllConfigSlugsForUser(config, user.getValue());
+
+            if (userSlugs.isEmpty()) {
+                toRemove.add(user.getKey());
+                continue;
+            }
+
             if (possibleSlugs == null) {
                 possibleSlugs = userSlugs;
             }
@@ -72,6 +79,8 @@ public class TrainingFiles {
                 possibleSlugs.retainAll(userSlugs);
             }
         }
+        // Remove users for which we have no data
+        toRemove.forEach(userMappings::remove);
 
         if (possibleSlugs == null) {
             throw new StorageException("No users were provided to look for");
