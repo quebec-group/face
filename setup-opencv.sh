@@ -9,8 +9,10 @@ fi
 VER="3.2.0"
 STARTDIR=`pwd`
 
-# Perform the build in home directory to avoid shared filesystem problems with make
-cd ~
+# Perform the build in some other directory to avoid building in the git tree
+echo "Please enter a directory to build in (need several GB free space)"
+read buildDir
+cd $buildDir
 
 # Remove any stale sources
 if [ "$1" == "--full" ]
@@ -55,11 +57,12 @@ cd opencv-$VER/release
 # Build!
 cmake -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib-$VER/modules -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=OFF -D BUILD_JAVA_SUPPORT=ON -D WITH_XINE=ON -D WITH_TBB=ON ..
 make -j 4
-make install
+echo "Require root to install..."
+sudo make install
 
 # Tidy up
 cd ../../
-#rm -rf opencv-$VER
+rm -rf opencv-$VER
 cd $STARTDIR
 
 # Copy the JAR out so that the likes of IntelliJ can use it
