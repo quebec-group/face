@@ -109,7 +109,7 @@ public class MessageProcessor implements MessageVisitor
         }
 
         Imgcodecs.imwrite(profilePhoto.getAbsolutePath(), image);
-        String s3FileName = "protected/" + videoId + "/photos/profilePhoto.jpg";
+        String s3FileName = "protected/videoThumbnails/" + videoId + ".jpg";
         s3Manager.uploadFile(profilePhoto, s3FileName);
 
         profilePhoto.delete();
