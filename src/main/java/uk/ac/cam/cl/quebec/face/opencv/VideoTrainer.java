@@ -43,7 +43,7 @@ public class VideoTrainer {
         List<FrameInspectionSummary> allFrames = Videos.inspectAllFrames(videoPath);
         List<FrameInspectionSummary> interestingFrames = allFrames.stream()
                 .filter(f -> f.getLaplacianVariance() > 100)
-                .filter(f -> f.getFacePosition().area() > 1000)
+        //        .filter(f -> f.getFacePosition().area() > 1000)
                 .collect(Collectors.toList());
 
         System.err.println(interestingFrames.size() + " frames accepted as viable for training. Choosing " + (int)maxFramesPerVideo);
@@ -114,7 +114,7 @@ public class VideoTrainer {
             for (; video.read(img) && currentFrame != frames.get(processed).getFrameNumber(); currentFrame++) ;
 
             // Get the face in the image
-            Mat colourFace = img.submat(frames.get(processed).getFacePosition());
+            Mat colourFace = img/*.submat(frames.get(processed).getFacePosition())*/;
             Mat face = Images.makeGreyscale(colourFace);
 
             // Train a recogniser on the new face
