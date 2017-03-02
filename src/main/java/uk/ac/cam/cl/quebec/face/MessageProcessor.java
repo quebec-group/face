@@ -2,12 +2,14 @@ package uk.ac.cam.cl.quebec.face;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
 import uk.ac.cam.cl.quebec.face.aws.EventProcessedLambdaInput;
 import uk.ac.cam.cl.quebec.face.aws.LambdaCaller;
 import uk.ac.cam.cl.quebec.face.aws.ProfileProcessedLambdaInput;
 import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.StorageException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
+import uk.ac.cam.cl.quebec.face.exceptions.VideoLoadException;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.opencv.*;
@@ -59,22 +61,32 @@ public class MessageProcessor implements MessageVisitor
         VideoRecogniser recogniser = new VideoRecogniser(config, msg.getRecognitionUserSet(), videoFileName);
         List<String> usersInVideo = recogniser.recognise();
 
+        // Generate thumbnail for video
+        VideoCapture video = new VideoCapture(videoFileName);
+        if (!video.isOpened()) {
+            throw new VideoLoadException("Failed to open video file for reading");
+        }
+
+        Mat thumbnail = new Mat();
+        video.read(thumbnail);
+        String S3Path = uploadThumbnail(msg.getVideoId(), thumbnail);
+
         // Upload results of processing to Amazon
-        sendEventResultsToLambda(msg.getEventId(), usersInVideo);
+        sendEventResultsToLambda(msg.getVideoId(), msg.getEventId(), usersInVideo, S3Path);
     }
 
-    private String uploadProfilePhoto(String userId, Mat photo) throws StorageException {
+    private String uploadThumbnail(int videoId, Mat image) throws StorageException {
         File tmpDir = DirectoryStructure.getOrMakeTempDirectory(config);
         File profilePhoto;
         try {
-            profilePhoto = File.createTempFile("profile", ".jpg", tmpDir);
+            profilePhoto = File.createTempFile("thumb", ".jpg", tmpDir);
         }
         catch (IOException e) {
             throw new StorageException("Could not create temp file for profile photo", e);
         }
 
-        Imgcodecs.imwrite(profilePhoto.getAbsolutePath(), photo);
-        String s3FileName = "protected/" + userId + "/photos/profilePhoto.jpg";
+        Imgcodecs.imwrite(profilePhoto.getAbsolutePath(), image);
+        String s3FileName = "protected/" + videoId + "/photos/profilePhoto.jpg";
         s3Manager.uploadFile(profilePhoto, s3FileName);
 
         profilePhoto.delete();
@@ -89,10 +101,12 @@ public class MessageProcessor implements MessageVisitor
         c.callProfileProcessedLambda(results);
     }
 
-    private void sendEventResultsToLambda(int eventId, List<String> usersInVideo) {
+    private void sendEventResultsToLambda(int eventId, int videoId, List<String> usersInVideo, String thumbnailS3Path) {
         EventProcessedLambdaInput results = new EventProcessedLambdaInput();
         results.setEventID(eventId);
+        results.setVideoID(videoId);
         results.setMembers(usersInVideo);
+        results.setThumbnailS3Path(thumbnailS3Path);
         LambdaCaller c = new LambdaCaller(config);
         c.callEventProcessedLambda(results);
     }
