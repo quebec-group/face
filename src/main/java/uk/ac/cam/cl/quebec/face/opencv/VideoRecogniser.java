@@ -1,6 +1,5 @@
 package uk.ac.cam.cl.quebec.face.opencv;
 
-import javafx.util.Pair;
 import org.opencv.core.Mat;
 import org.opencv.face.FaceRecognizer;
 import org.opencv.videoio.VideoCapture;
@@ -104,8 +103,8 @@ public class VideoRecogniser {
                 .entrySet()
                 .stream()
                 .filter(e -> e.getValue() > minNumberOfFramesMatching)
-                .map(e -> new Pair<>(userMappings.get(e.getKey()), e.getValue()))
-                .map(Pair::getKey)
+                .map(e -> new AbstractMap.SimpleEntry<>(userMappings.get(e.getKey()), e.getValue()))
+                .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
 
