@@ -14,6 +14,7 @@ import uk.ac.cam.cl.quebec.face.storage.TrainingFiles;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Business logic for training on videos, to separate this from aws integration
@@ -41,8 +42,17 @@ public class VideoTrainer {
 
         // First pass
         List<FrameInspectionSummary> allFrames = Videos.inspectAllFrames(videoPath);
+
+        List<Double> variances = allFrames.stream()
+                .map(FrameInspectionSummary::getLaplacianVariance)
+                .collect(Collectors.toList());
+        double minVariance = variances.stream().min(Comparator.naturalOrder()).get();
+        double maxVariance = variances.stream().max(Comparator.naturalOrder()).get();
+        // Take frames in the top 20% of the range of variances found
+        double varianceThreshold = maxVariance - (maxVariance - minVariance) / 5;
+
         List<FrameInspectionSummary> interestingFrames = allFrames.stream()
-                .filter(f -> f.getLaplacianVariance() > 100)
+                .filter(f -> f.getLaplacianVariance() > varianceThreshold)
         //        .filter(f -> f.getFacePosition().area() > 1000)
                 .collect(Collectors.toList());
 
