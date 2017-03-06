@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by plott on 14/02/2017.
+ * Class holding basic algorithms for face detection.
  */
 public class Detect {
     private static final String classifierPath = "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml";

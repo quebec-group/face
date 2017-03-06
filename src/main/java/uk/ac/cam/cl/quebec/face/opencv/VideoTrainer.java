@@ -142,9 +142,8 @@ public class VideoTrainer {
             }
 
             // Get the face in the image
-            Mat colourFace = img/*.submat(frames.get(processed).getFacePosition())*/;
-            Logging.getLogger().info("Size of training image is " + colourFace.size().toString());
-            Mat face = Images.makeGreyscale(colourFace);
+            Logging.getLogger().info("Size of training image is " + img.size().toString());
+            Mat face = Images.makeGreyscale(img);
 
             // Train a recogniser on the new face
             LBPHFaceRecognizer recognizer = Face.createLBPHFaceRecognizer();

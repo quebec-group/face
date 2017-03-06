@@ -9,7 +9,6 @@ import uk.ac.cam.cl.quebec.face.config.Config;
 
 public class CredentialsManager {
     private static AWSCredentials credentials;
-    private static String credentialsPath = "/Users/callum/Desktop/SqsCredentials.txt";
     private static Region region = Region.getRegion(Regions.EU_WEST_1);
 
     /*

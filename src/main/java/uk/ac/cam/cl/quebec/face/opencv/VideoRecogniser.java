@@ -57,7 +57,6 @@ public class VideoRecogniser {
 
         System.err.println(usersInVideo);
 
-        // TODO: Store results of processing persistently on disk
 
         return usersInVideo;
     }

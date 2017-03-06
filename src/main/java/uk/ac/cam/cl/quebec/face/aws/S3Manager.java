@@ -10,8 +10,6 @@ import uk.ac.cam.cl.quebec.face.config.Config;
 import uk.ac.cam.cl.quebec.face.exceptions.AmazonException;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 import uk.ac.cam.cl.quebec.face.messages.S3DataHoldingMessage;
-import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
-import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.storage.DirectoryStructure;
 
 import java.io.File;
