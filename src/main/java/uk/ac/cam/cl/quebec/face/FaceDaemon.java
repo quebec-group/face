@@ -24,47 +24,11 @@ public class FaceDaemon
 {
     private Config mConfig;
 
-    // Temporary fake queue
-    private List<Message> tempQueue;
-    private int currentMsg;
     private MessageQueue queue;
 
     public FaceDaemon(Config config) throws QuebecException {
         mConfig = config;
-
-        tempQueue = makeDummyMessageQueue();
-        currentMsg = 0;
-
         queue = new MessageQueue(config);
-    }
-
-    private List<Message> makeDummyMessageQueue() {
-        List<Message> queue = new ArrayList<>();
-
-        queue.add(new TrainOnVideoMessage(0, "Jeremy", "img/training/0/0.jpg"));
-        queue.add(new TrainOnVideoMessage(1, "Jeremy", "img/training/0/1.jpg"));
-        queue.add(new TrainOnVideoMessage(2, "Jeremy", "img/training/0/2.jpg"));
-        queue.add(new TrainOnVideoMessage(3, "Jeremy", "img/training/0/3.jpg"));
-        queue.add(new TrainOnVideoMessage(4, "Jeremy", "img/training/0/4.jpg"));
-        queue.add(new TrainOnVideoMessage(10, "Richard", "img/training/1/0.jpg"));
-        queue.add(new TrainOnVideoMessage(11, "Richard", "img/training/1/1.jpg"));
-        queue.add(new TrainOnVideoMessage(12, "Richard", "img/training/1/2.jpg"));
-        queue.add(new TrainOnVideoMessage(20, "Larry", "img/training/2/0.jpg"));
-        queue.add(new TrainOnVideoMessage(21, "Larry", "img/training/2/1.jpg"));
-        queue.add(new TrainOnVideoMessage(22, "Larry", "img/training/2/2.jpg"));
-
-        Set<String> photos1 = new HashSet<>();
-        photos1.add("Jeremy");
-        photos1.add("Richard");
-        queue.add(new ProcessVideoMessage(11, 1, "img/video/0.mp4", photos1));
-
-        Set<String> photos2 = new HashSet<>();
-        photos2.add("Jeremy");
-        photos2.add("Richard");
-        photos2.add("Larry");
-        queue.add(new ProcessVideoMessage(12, 2, "img/video/0.mp4", photos2));
-
-        return queue;
     }
 
     // Blocks on queue, waiting for messages until timeout (secs) expires
@@ -82,22 +46,6 @@ public class FaceDaemon
         }
 
         return nextMessage;
-    }
-
-    private Message getJobFromQueueWhenTesting(int timeout) throws QuebecException {
-        if (currentMsg < tempQueue.size()) {
-            currentMsg++;
-            return tempQueue.get(currentMsg-1);
-        }
-
-        try {
-            File stopFile = new File(mConfig.StopFilePath);
-            stopFile.createNewFile();
-        }
-        catch (IOException e) {
-            throw new QuebecException("Error creating stop file to terminate daemon.");
-        }
-        return null;
     }
 
     private void run()

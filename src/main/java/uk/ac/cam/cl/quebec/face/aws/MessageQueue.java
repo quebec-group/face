@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import uk.ac.cam.cl.quebec.face.config.Config;
+import uk.ac.cam.cl.quebec.face.exceptions.AmazonException;
 import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.WaitMessage;
@@ -24,7 +25,7 @@ public class MessageQueue {
         sqs.setRegion(CredentialsManager.getRegion());
     }
 
-    public uk.ac.cam.cl.quebec.face.messages.Message getMessage() {
+    public uk.ac.cam.cl.quebec.face.messages.Message getMessage() throws AmazonException {
         List<Message> messages = sqs.receiveMessage(config.QueueUrl).getMessages();
 
         if (messages.isEmpty()) {
@@ -40,18 +41,18 @@ public class MessageQueue {
             String messageType = (String) json.get("type");
             switch (messageType) {
                 case "Training Video":
+                    System.err.println("Received json: " + json);
                     faceMessage = TrainOnVideoMessage.constructFromJson(json);
                     break;
                 case "Event Video":
+                    System.err.println("Received json: " + json);
                     faceMessage = ProcessVideoMessage.constructFromJson(json);
                     break;
                 default:
-                    faceMessage = new WaitMessage();
-                    break;
+                    throw new AmazonException("Received unknown message type. Type was " + messageType);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
-            faceMessage = new WaitMessage();
+            throw new AmazonException("Failed to parse json. input follows: " + sqsMessage.getBody(), e);
         } finally {
             sqs.deleteMessage(config.QueueUrl, sqsMessage.getReceiptHandle());
         }

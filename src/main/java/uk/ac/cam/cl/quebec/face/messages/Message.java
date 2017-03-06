@@ -4,7 +4,7 @@ import uk.ac.cam.cl.quebec.face.MessageVisitor;
 import uk.ac.cam.cl.quebec.face.exceptions.QuebecException;
 
 /**
- * Created by plott on 14/02/2017.
+ * A message passed to use from AWS Lambda via SQS
  */
 public interface Message {
     void visit(MessageVisitor visitor) throws QuebecException;

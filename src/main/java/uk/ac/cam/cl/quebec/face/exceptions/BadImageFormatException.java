@@ -1,7 +1,7 @@
 package uk.ac.cam.cl.quebec.face.exceptions;
 
 /**
- * Created by plott on 14/02/2017.
+ * Error thrown when we have an image/frame which has bad values
  */
 public class BadImageFormatException extends QuebecException {
     public BadImageFormatException(String message, Exception innerException) {

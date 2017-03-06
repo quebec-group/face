@@ -5,7 +5,7 @@ import uk.ac.cam.cl.quebec.face.messages.ProcessVideoMessage;
 import uk.ac.cam.cl.quebec.face.messages.TrainOnVideoMessage;
 
 /**
- * Created by plott on 14/02/2017.
+ * Simple visitor interface for messages from AWS.
  */
 public interface MessageVisitor {
     void accept(ProcessVideoMessage msg) throws QuebecException;
