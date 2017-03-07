@@ -23,6 +23,7 @@ public class MessageQueue {
         this.config = config;
         sqs = new AmazonSQSClient(CredentialsManager.getCredentials(config));
         sqs.setRegion(CredentialsManager.getRegion());
+        Monitor.setConfig(config);
     }
 
     public uk.ac.cam.cl.quebec.face.messages.Message getMessage() throws AmazonException {
