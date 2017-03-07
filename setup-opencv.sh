@@ -10,8 +10,11 @@ VER="3.2.0"
 STARTDIR=`pwd`
 
 # Perform the build in some other directory to avoid building in the git tree
-echo "Please enter a directory to build in (need several GB free space)"
-read buildDir
+if [ "$buildDir" == "" ]
+then
+    echo "Please enter a directory to build in (need several GB free space)"
+    read buildDir
+fi
 cd $buildDir
 
 # Remove any stale sources
