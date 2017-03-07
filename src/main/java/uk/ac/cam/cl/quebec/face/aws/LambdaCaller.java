@@ -31,10 +31,12 @@ public class LambdaCaller {
     }
 
     public LambdaOutput callEventProcessedLambda(EventProcessedLambdaInput input) {
+        Monitor.getInstance().faceCall("Event Processed");
         return eventService.run(input);
     }
 
     public LambdaOutput callProfileProcessedLambda(ProfileProcessedLambdaInput input) {
+        Monitor.getInstance().faceCall("Training Processed");
         return profileService.run(input);
     }
 }
