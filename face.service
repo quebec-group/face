@@ -1,0 +1,11 @@
+[Unit]
+Description=Face recognition daemon for Quebec group project
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/usr/bin/java -cp "/home/ubuntu/face/build/libs/face.jar:/usr/local/share/OpenCV/java/opencv-3.2.0.jar:/home/ubuntu/face/lib/*" -Djava.library.path=/usr/local/share/OpenCV/java uk.ac.cam.cl.quebec.face.FaceDaemon /home/ubuntu/face-config.json
+ExecStop=/usr/bin/touch /mnt/face-stop
+
+[Install]
+WantedBy=multi-user.target
